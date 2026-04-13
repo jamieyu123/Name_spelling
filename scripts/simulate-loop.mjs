@@ -1,12 +1,7 @@
 /**
- * Name-call simulation: assistant opens → customer ↔ assistant until:
- *   – previous assistant turn asked to confirm spelling, AND
- *   – customer explicitly says yes / correct (etc.), AND
- *   – assistant replies with a short thanks / acknowledgment → then STOP.
- * Otherwise runs until MAX_TURNS.
- *
- *   1) Prints the assistant opener first (no API call for that line).
- *   2) Customer hears the [reply] line as TTS.
+ * Name-call simulation: confirm question → customer yes → assistant thanks → STOP (see assistantSaysThanksAck).
+ * Spell-only prompts (deletrear, etc.) do not complete the sequence until a yes/no confirm appears. MAX_TURNS otherwise.
+ * Prints opener first (no API); caller hears [reply] as TTS.
  *
  * Usage:
  *   node scripts/simulate-loop.mjs
@@ -14,6 +9,10 @@
  *   node scripts/simulate-loop.mjs --batch
  *     → runs every id in data/test-names.es.json → data/simulation-results.es.txt
  *       and every id in data/test-names.en.json → data/simulation-results.en.txt
+ *   node scripts/simulate-loop.mjs --batch --locale es
+ *     → Spanish batch only (rewrites simulation-results.es.txt)
+ *   node scripts/simulate-loop.mjs --batch --locale en
+ *     → English batch only (rewrites simulation-results.en.txt)
  *
  * Env: OPENAI_API_KEY (required); optional SIMULATE_MODEL, MAX_TURNS
  */
@@ -35,22 +34,23 @@ const ASSISTANT_OPENER = "Hi, could I get your first and last name, please?";
 /**
  * Only for this script: after name/spelling is confirmed, do not move to another agenda item.
  */
-const SIMULATION_SCOPE = `Simulation scope (strict): Your only job here is to collect and confirm the caller's name. When they have confirmed the spelling is correct, your very next reply must be ONLY a brief thanks in one short sentence (e.g. thanks for confirming). Do not ask what else they need, do not ask how you can help next, do not open a new topic—stop after thanks.`;
-
-// --- helpers -----------------------------------------------------------------
+const SIMULATION_SCOPE = `Simulation scope (strict): Your only job is to collect and confirm the caller's name. When they confirm the spelling is correct, your very next reply must be ONLY one short sentence of thanks (e.g. thanks for confirming the name). No follow-up questions, no "anything else I can help with", no goodbyes that reopen the topic, no apologies for silence—one thanks sentence and the name task is done.`;
 
 function parseCommandLine(argv) {
   let locale = "en";
   let id = null;
   let batch = false;
+  let localeExplicit = false;
   let outDir = path.join(root, "data");
   for (let i = 0; i < argv.length; i++) {
-    if (argv[i] === "--locale" && argv[i + 1]) locale = argv[++i];
-    else if (argv[i] === "--id" && argv[i + 1]) id = argv[++i];
+    if (argv[i] === "--locale" && argv[i + 1]) {
+      locale = argv[++i];
+      localeExplicit = true;
+    } else if (argv[i] === "--id" && argv[i + 1]) id = argv[++i];
     else if (argv[i] === "--batch") batch = true;
     else if (argv[i] === "--out-dir" && argv[i + 1]) outDir = path.resolve(argv[++i]);
   }
-  return { locale, id, batch, outDir };
+  return { locale, id, batch, outDir, localeExplicit };
 }
 
 function loadNameEntries(locale) {
@@ -79,12 +79,17 @@ function buildCustomerSystemPrompt(fullName, locale) {
     locale === "es"
       ? "Respond in natural Spanish, short (1–3 sentences per turn)."
       : "Respond in natural English, short (1–3 sentences per turn).";
+  const hangUp =
+    locale === "es"
+      ? `After the agent thanks you for confirming your name (e.g. "gracias por confirmar"), you may say "de nada" once or stay silent—do not ask whether they need anything else, do not ask if they are still on the line, do not simulate hanging up or prolonged silence in parentheses, and do not start a new topic. The name task is finished.`
+      : `After the agent thanks you for confirming your name, you may say "you're welcome" briefly or stay silent—do not ask for anything else or simulate call mechanics. The name task is finished.`;
   return [
     `You are the human caller (not the agent).`,
     `Your real full name is exactly: "${fullName}".`,
     lang,
     `Give your name when asked. If the agent asks you to spell it, spell it letter by letter accurately.`,
     `If the agent asks whether the spelling is correct, answer with an explicit yes or correct only if it matches your real name.`,
+    hangUp,
     `Do not say you are an AI.`,
   ].join("\n");
 }
@@ -93,7 +98,8 @@ function heardAgentPrompt(spokenText) {
   return `The agent just said (this is what you heard on the phone):\n"${spokenText}"\n\nWhat do you say next?`;
 }
 
-function assistantAskedSpellingConfirm(spoken) {
+// Yes/no on spelling only (not spell-requests like deletrear).
+function assistantAskedYesNoConfirmSpelling(spoken) {
   return (
     /is (that|it) (correct|right)\??/i.test(spoken) ||
     /is it\s+[A-Z]/i.test(spoken) ||
@@ -102,47 +108,65 @@ function assistantAskedSpellingConfirm(spoken) {
     /did I get (that|it) (all )?right\??/i.test(spoken) ||
     /sound (alright|right|good)\??/i.test(spoken) ||
     /does that (look|sound) (right|correct)\??/i.test(spoken) ||
-    // Spanish: "déjeme confirmar … ¿Es correcto?"
-    /d[eé]jeme\s+confirmar/i.test(spoken) ||
+    /(d[eé]jame|d[eé]jeme)\s+confirmar/i.test(spoken) ||
     /perm[ií]tame\s+confirmar/i.test(spoken) ||
     /¿?\s*es\s+correcto/i.test(spoken) ||
     /¿?\s*está\s+correcto/i.test(spoken) ||
-    // Spanish: "Solo para confirmar la escritura …" / "¿Está bien escrito así?"
     /confirmar\s+la\s+escritura/i.test(spoken) ||
     /está\s+bien\s+escrito/i.test(spoken) ||
     /bien\s+escrito\s+así/i.test(spoken) ||
-    /¿?\s*está\s+bien\s+así/i.test(spoken)
+    /¿?\s*está\s+bien\s+así/i.test(spoken) ||
+    /correcto\s+as[ií]/i.test(spoken) ||
+    /as[ií]\s+est(á|a)\s+(bien|correcto)/i.test(spoken) ||
+    /todo\s+correcto/i.test(spoken) ||
+    /va\s+bien\s+as[ií]/i.test(spoken) ||
+    /\b(lo\s+he\s+dicho|dicho\s+bien|tal\s+cual)\b/i.test(spoken) ||
+    /\bverdad\s*\?/i.test(spoken)
   );
 }
 
-/** Customer explicitly agrees (after assistant asked to confirm spelling). */
 function customerSaysExplicitYes(text) {
   const t = text.trim();
+  if (/^\s*no[,.]?\s+(el|la|los|el\s+apellido|el\s+nombre|pero|espera|solo)\b/i.test(t)) return false;
   if (/^\s*(yes|yeah|yep|yup|correct|that'?s right|that'?s correct|exactly)\b/i.test(t)) return true;
-  // Spanish sí: do not use \b after sí — JS \b is ASCII-\w only, so "Sí," has no boundary after í
   if (/^\s*s[ií](?:$|[\s,.;:!?]|est(á|a)\s|es\s)/i.test(t)) return true;
   if (/^\s*(correcto|exacto)\b/i.test(t)) return true;
-  // e.g. "… es correcto" / "… está correcto"
-  if (/\b(es|está)\s+correcto\b/i.test(t)) return true;
-  return false;
-}
-
-/** Assistant closes with thanks — must pair with prior customer yes + prior confirm ask. */
-function assistantSaysThanksAck(spoken) {
-  const t = spoken.trim();
-  // English + Spanish closings; "perfecto" not matched by ^perfect\b (no boundary before final o)
-  if (/^(thanks|thank you|got it|perfecto?|great|awesome|appreciate it|gracias|muy\s+bien)\b/i.test(t))
+  if (/\b(es|está)\s+correcto\b/i.test(t)) {
+    if (/\bno\s+(es|está)\s+correcto\b/i.test(t)) return false;
     return true;
-  if (/^(okay|alright),?\s+(thanks|thank you|perfecto?|great)\b/i.test(t)) return true;
-  if (/\b(thanks|thank you|gracias),?\s+(I'?ve got|I have|noted|por\s+confirm)/i.test(t)) return true;
-  // "Perfect, thanks …" / "Perfecto, gracias …"
-  if (/^(perfecto?|great|awesome),?\s+(thanks?|gracias)\b/i.test(t)) return true;
+  }
   return false;
 }
 
-// --- main --------------------------------------------------------------------
+// Terminal thanks after confirm (not thanks + another question or small talk).
+function assistantSaysThanksAck(spoken) {
+  const t = spoken
+    .replace(/\s+/g, " ")
+    .replace(/[—–]/g, ",")
+    .trim();
+  if (!t) return false;
+  if (/¿/.test(t) || /\?/.test(t)) return false;
+  if (t.length > 220) return false;
+  if (
+    /\b(hay\s+algo\s+m[aá]s|algo\s+m[aá]s\s+en\s+lo\s+que|sigues\s+en\s+(la\s+)?l[ií]nea|no\s+escuch[eé]|cort[óo]\s+el\s+audio|empez(ar|emos)\s+de\s+nuevo|me\s+dices\s+por\s+favor\s+tu\s+nombre|me\s+recuerdas|me\s+repites)\b/i.test(
+      t
+    )
+  ) {
+    return false;
+  }
+  if (/\b(qu[eé]\s+tengas|que\s+tenga|buen\s+d[ií]a|hasta\s+luego|encantad[oa])\b/i.test(t)) {
+    if (!/\b(por\s+confirm|for\s+confirm)/i.test(t)) return false;
+  }
 
-/** @param {{ log: function(string): void, logErr: function(string): void }} sinks */
+  if (/^perfecto\s*,?\s*(muchas\s+)?gracias\s+por\s+confirm/i.test(t)) return true;
+  if (/^(genial|excelente)\s*,?\s*gracias(\s+por\s+confirm)?/i.test(t)) return true;
+  if (/^muy\s+bien\s*,?\s*gracias(\s+por\s+confirm)?/i.test(t)) return true;
+  if (/^(thanks|thank you)\b/i.test(t) && /\bconfirm/i.test(t)) return true;
+  if (/\bgracias\s+por\s+confirm(arlo|ar|ado)?\b/i.test(t)) return true;
+  if (/^(muchas\s+)?gracias\s*[.!]?$/i.test(t)) return true;
+  return false;
+}
+
 async function runOneSimulation(openai, { locale, id, fullName }, sinks) {
   const log = sinks.log;
   const logErr = sinks.logErr;
@@ -166,7 +190,7 @@ async function runOneSimulation(openai, { locale, id, fullName }, sinks) {
     { role: "assistant", content: ASSISTANT_OPENER },
   ];
 
-  let previousAssistantAskedConfirm = false;
+  let pendingYesNoConfirmSpelling = false;
 
   for (let turn = 1; turn <= MAX_TURNS; turn++) {
     const custRes = await openai.chat.completions.create({
@@ -179,7 +203,7 @@ async function runOneSimulation(openai, { locale, id, fullName }, sinks) {
     customerMessages.push({ role: "assistant", content: customerText });
 
     const customerAffirmsSpelling =
-      previousAssistantAskedConfirm && customerSaysExplicitYes(customerText);
+      pendingYesNoConfirmSpelling && customerSaysExplicitYes(customerText);
 
     log(`--- Turn ${turn} · CUSTOMER (caller) ---`);
     log(customerText);
@@ -203,20 +227,20 @@ async function runOneSimulation(openai, { locale, id, fullName }, sinks) {
     log("");
 
     if (customerAffirmsSpelling && assistantSaysThanksAck(spoken)) {
-      logErr("=== Stopped: customer confirmed spelling; assistant thanked. ===\n");
+      logErr("=== Stopped: confirm → yes → thanks. ===\n");
       return;
     }
 
-    previousAssistantAskedConfirm = assistantAskedSpellingConfirm(spoken);
+    pendingYesNoConfirmSpelling = assistantAskedYesNoConfirmSpelling(spoken);
 
     customerMessages.push({ role: "user", content: heardAgentPrompt(spoken) });
   }
 
-  logErr(`=== Stopped: reached MAX_TURNS (${MAX_TURNS}) without yes → thanks sequence. ===\n`);
+  logErr(`=== Stopped: MAX_TURNS (${MAX_TURNS}) without confirm → yes → thanks. ===\n`);
 }
 
 async function main() {
-  const { locale, id: idFromCli, batch, outDir } = parseCommandLine(process.argv.slice(2));
+  const { locale, id: idFromCli, batch, outDir, localeExplicit } = parseCommandLine(process.argv.slice(2));
 
   if (!process.env.OPENAI_API_KEY) {
     console.error("Missing OPENAI_API_KEY in environment.");
@@ -246,8 +270,16 @@ async function main() {
       console.error(`Wrote ${chunks.length} simulation(s) to ${outPath}`);
     };
 
-    await runLocaleBatch("es");
-    await runLocaleBatch("en");
+    if (localeExplicit) {
+      if (locale !== "es" && locale !== "en") {
+        console.error('With --batch, --locale must be "es" or "en".');
+        process.exit(1);
+      }
+      await runLocaleBatch(locale);
+    } else {
+      await runLocaleBatch("es");
+      await runLocaleBatch("en");
+    }
     return;
   }
 

@@ -1,0 +1,17 @@
+{
+  "version": 1,
+  "locale": "es",
+  "description": "Spanish-language style full names for testing name capture and spelling flows.",
+  "names": [
+    { "id": "es-1", "fullName": "José García" },
+    { "id": "es-2", "fullName": "María López" },
+    { "id": "es-3", "fullName": "Carlos Martínez" },
+    { "id": "es-4", "fullName": "Ana Rodríguez" },
+    { "id": "es-5", "fullName": "Luis Fernández" },
+    { "id": "es-6", "fullName": "Carmen Sánchez" },
+    { "id": "es-7", "fullName": "Miguel González" },
+    { "id": "es-8", "fullName": "Laura Pérez" },
+    { "id": "es-9", "fullName": "Francisco Ruiz" },
+    { "id": "es-10", "fullName": "Isabel Moreno" }
+  ]
+}

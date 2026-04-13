@@ -1,0 +1,276 @@
+--- ASSISTANT (opener) ---
+Hi, could I get your first and last name, please?
+
+--- Turn 1 · CUSTOMER (caller) ---
+Sí, claro, mi nombre es José García.
+
+--- Turn 1 · ASSISTANT (agent) ---
+[thought]: confirm spelling spanish letters
+[reply]: Perfecto, gracias José García. Para que quede bien escrito, ¿me lo puedes deletrear, por favor, tu nombre y tu apellido, letra por letra?
+
+--- Turn 2 · CUSTOMER (caller) ---
+Sí, claro.  
+José: J-O-S-É.  
+García: G-A-R-C-Í-A.
+
+--- Turn 2 · ASSISTANT (agent) ---
+[thought]: confirm spelled name spanish letters
+[reply]: Vale, déjame confirmar: José García.  
+"José" sería: jota, o, ese, e con acento.  
+<break time="0.2s"/> Y el apellido "García" sería: ge, a, erre, ce, i con acento, a.  
+¿Está correcto así?
+
+--- Turn 3 · CUSTOMER (caller) ---
+Sí, así está correcto.
+
+--- Turn 3 · ASSISTANT (agent) ---
+[thought]: close
+[reply]: Perfecto, gracias por confirmarlo.
+
+
+========================================================================
+
+--- ASSISTANT (opener) ---
+Hi, could I get your first and last name, please?
+
+--- Turn 1 · CUSTOMER (caller) ---
+Sí, claro, mi nombre es María López.
+
+--- Turn 1 · ASSISTANT (agent) ---
+[thought]: confirm spelling spanish first round
+[reply]: Perfecto, gracias María. Déjeme confirmar la escritura, por favor: ¿es “María López”, M de mamá, A de árbol, R de rosa, Í de iglesia con tilde, A de avión <break time="0.2s"/> y “López” L de luna, O de oso, P de perro, E de elefante, Z de zapato? ¿Así está correcto?
+
+--- Turn 2 · CUSTOMER (caller) ---
+Sí, así está correcto.
+
+--- Turn 2 · ASSISTANT (agent) ---
+[thought]: close
+[reply]: Perfecto, gracias por confirmarlo.
+
+
+========================================================================
+
+--- ASSISTANT (opener) ---
+Hi, could I get your first and last name, please?
+
+--- Turn 1 · CUSTOMER (caller) ---
+Sí, claro, mi nombre es Carlos Martínez.
+
+--- Turn 1 · ASSISTANT (agent) ---
+[thought]: confirm in Spanish with letters
+[reply]: Vale, gracias Carlos. Déjeme confirmar cómo se escribe, ¿sí?  
+¿Es Carlos, ce, a, erre, ele, o, ese <break time="0.2s"/> y Martínez, eme, a, erre, te, i, ene, e, zeta? ¿Así está correcto?
+
+--- Turn 2 · CUSTOMER (caller) ---
+Sí, así está correcto.
+
+--- Turn 2 · ASSISTANT (agent) ---
+[thought]: close with thanks
+[reply]: Perfecto, Carlos Martínez, gracias por confirmarlo.
+
+
+========================================================================
+
+--- ASSISTANT (opener) ---
+Hi, could I get your first and last name, please?
+
+--- Turn 1 · CUSTOMER (caller) ---
+Sí, claro, mi nombre es Ana Rodríguez.
+
+--- Turn 1 · ASSISTANT (agent) ---
+[thought]: confirm spelling spanish letters
+[reply]: Gracias, Ana. Para anotarlo bien, ¿me puedes deletrear tu nombre y tu apellido, letra por letra, por favor?
+
+--- Turn 2 · CUSTOMER (caller) ---
+Sí, claro.  
+Ana: A - N - A.  
+Rodríguez: R - O - D - R - Í - G - U - E - Z.
+
+--- Turn 2 · ASSISTANT (agent) ---
+[thought]: confirm by spelling back once spanish letters
+[reply]: Perfecto, déjame confirmar: Ana sería a, ene, a <break time="0.2s"/> y Rodríguez sería erre, o, de, erre, i con tilde, ge, u, e, zeta. ¿Está correcto así?
+
+--- Turn 3 · CUSTOMER (caller) ---
+Sí, está correcto así.
+
+--- Turn 3 · ASSISTANT (agent) ---
+[thought]: close
+[reply]: Perfecto, gracias por confirmarlo.
+
+
+========================================================================
+
+--- ASSISTANT (opener) ---
+Hi, could I get your first and last name, please?
+
+--- Turn 1 · CUSTOMER (caller) ---
+Sí, claro, mi nombre es Luis Fernández.
+
+--- Turn 1 · ASSISTANT (agent) ---
+[thought]: confirm name spelling spanish
+[reply]: Perfecto, gracias Luis. Para dejarlo bien anotado, ¿me puedes deletrear tu nombre y tu apellido, letra por letra, por favor?
+
+--- Turn 2 · CUSTOMER (caller) ---
+Claro, mi nombre es L‑u‑i‑s y mi apellido es F‑e‑r‑n‑á‑n‑d‑e‑z.
+
+--- Turn 2 · ASSISTANT (agent) ---
+[thought]: confirm spelled name once
+[reply]: Gracias, Luis. Entonces confirmo: Luis es ele, u, i, ese, y Fernández es efe, e, erre, ene, a, ene, de, e, zeta. ¿Está correcto así?
+
+--- Turn 3 · CUSTOMER (caller) ---
+Casi, solo faltó el acento en la á de Fernández, pero por lo demás está correcto.
+
+--- Turn 3 · ASSISTANT (agent) ---
+[thought]: final thanks only
+[reply]: Perfecto, gracias por confirmar, Luis Fernández.
+
+
+========================================================================
+
+--- ASSISTANT (opener) ---
+Hi, could I get your first and last name, please?
+
+--- Turn 1 · CUSTOMER (caller) ---
+Sí, claro, mi nombre es Carmen Sánchez.
+
+--- Turn 1 · ASSISTANT (agent) ---
+[thought]: confirm in Spanish with letters
+[reply]: Vale, gracias Carmen. Déjeme confirmar cómo se escribe su nombre y apellido, ¿sí?  
+Carmen, ¿es ce, a, erre, eme, e, ene <break time="0.2s"/> y Sánchez, es ese, a, ene, che, e, zeta?  
+¿Está correcto así?
+
+--- Turn 2 · CUSTOMER (caller) ---
+No, casi. Es Carmen con ce, a, erre, eme, e, ene, y Sánchez con ese, a, ene, ce, hache, e, zeta.
+
+--- Turn 2 · ASSISTANT (agent) ---
+[thought]: confirm again with clearer spelling style
+[reply]: Perfecto, gracias por aclararlo. Entonces, déjeme repetirlo más claro:  
+Carmen: C de Casa, A de América, R de Ramón, M de Madrid, E de España, N de Navarra <break time="0.2s"/> y Sánchez: S de Sevilla, A de América, N de Navarra, C de Casa, H de Hotel, E de España, Z de Zaragoza.  
+¿Está bien escrito así?
+
+--- Turn 3 · CUSTOMER (caller) ---
+Sí, así está correcto, muchas gracias.
+
+--- Turn 3 · ASSISTANT (agent) ---
+[thought]: close with thanks
+[reply]: Perfecto, muchas gracias por confirmarlo.
+
+
+========================================================================
+
+--- ASSISTANT (opener) ---
+Hi, could I get your first and last name, please?
+
+--- Turn 1 · CUSTOMER (caller) ---
+Sí, claro, mi nombre es Miguel González.
+
+--- Turn 1 · ASSISTANT (agent) ---
+[thought]: confirm spanish name w letters
+[reply]: Vale, gracias Miguel. Déjame confirmar cómo se escribe tu nombre y apellido.  
+¿Me lo puedes deletrear, por favor, primero el nombre Miguel y luego el apellido González, letra por letra?
+
+--- Turn 2 · CUSTOMER (caller) ---
+Sí, claro.  
+Miguel: M-I-G-U-E-L.  
+González: G-O-N-Z-Á-L-E-Z.
+
+--- Turn 2 · ASSISTANT (agent) ---
+[thought]: spell back once in Spanish letters and confirm
+[reply]: Perfecto, gracias. Entonces, déjame confirmar:  
+Miguel es eme, i, ge, u, e, ele,  
+<break time="0.2s"/> y González es ge, o, ene, zeta, a con acento, ele, e, zeta.  
+¿Está correcto así?
+
+--- Turn 3 · CUSTOMER (caller) ---
+No, casi.  
+González es ge, o, ene, zeta, **á** con acento, ele, e, zeta.
+
+--- Turn 3 · ASSISTANT (agent) ---
+[thought]: 2nd confirm w "letra de palabra", then next turn will just thank
+[reply]: Vale, gracias por la corrección. Lo repito más claro:  
+Miguel: M de Madrid, I de Iglesia, G de Gato, U de Uruguay, E de España, L de Lima.  
+<break time="0.2s"/>  
+Y González: G de Gato, O de Oro, N de Navarra, Z de Zaragoza, Á de Águila con acento, L de Lima, E de España, Z de Zaragoza.  
+¿Así está bien escrito tu nombre completo?
+
+--- Turn 4 · CUSTOMER (caller) ---
+Sí, así está correcto, está bien escrito mi nombre completo.
+
+--- Turn 4 · ASSISTANT (agent) ---
+[thought]: closing thanks only
+[reply]: Perfecto, gracias por confirmarlo.
+
+
+========================================================================
+
+--- ASSISTANT (opener) ---
+Hi, could I get your first and last name, please?
+
+--- Turn 1 · CUSTOMER (caller) ---
+Sí, claro, mi nombre es Laura Pérez.
+
+--- Turn 1 · ASSISTANT (agent) ---
+[thought]: confirm in Spanish with letters
+[reply]: Vale, gracias Laura. Déjeme confirmar su nombre y apellido, ¿sí?  
+¿Es Laura Pérez, verdad? Podría por favor deletrearme su nombre y su apellido, letra por letra.
+
+--- Turn 2 · CUSTOMER (caller) ---
+Sí, claro.  
+Laura: L-A-U-R-A.  
+Pérez: P-É-R-E-Z.
+
+--- Turn 2 · ASSISTANT (agent) ---
+[thought]: confirm spelling once in Spanish
+[reply]: Perfecto, gracias. Entonces, déjeme confirmar: Laura Pérez.  
+Se escribe: Laura — ele, a, u, erre, a <break time="0.2s"/> y Pérez — pe, e, erre, e, zeta.  
+¿Está correcto así?
+
+
+========================================================================
+
+--- ASSISTANT (opener) ---
+Hi, could I get your first and last name, please?
+
+--- Turn 1 · CUSTOMER (caller) ---
+Sí, claro, mi nombre es Francisco Ruiz.
+
+--- Turn 1 · ASSISTANT (agent) ---
+[thought]: confirm in Spanish with letters
+[reply]: Vale, gracias Francisco. Déjame confirmar tu nombre y apellido.  
+¿Es Francisco Ruiz, verdad? Si puedes, ¿me lo puedes deletrear, nombre y apellido, letra por letra?
+
+--- Turn 2 · CUSTOMER (caller) ---
+Sí, correcto, es Francisco Ruiz.  
+Francisco: F-R-A-N-C-I-S-C-O.  
+Ruiz: R-U-I-Z.
+
+--- Turn 2 · ASSISTANT (agent) ---
+[thought]: confirm spelling once
+[reply]: Perfecto, déjame confirmarlo: Francisco, deletreado F, R, A, N, C, I, S, C, O, y Ruiz, R, U, I, Z. ¿Está correcto así?
+
+--- Turn 3 · CUSTOMER (caller) ---
+Sí, está correcto.
+
+--- Turn 3 · ASSISTANT (agent) ---
+[thought]: close with thanks
+[reply]: Perfecto, gracias por confirmarlo.
+
+
+========================================================================
+
+--- ASSISTANT (opener) ---
+Hi, could I get your first and last name, please?
+
+--- Turn 1 · CUSTOMER (caller) ---
+Sí, claro, me llamo Isabel Moreno.
+
+--- Turn 1 · ASSISTANT (agent) ---
+[thought]: confirm in Spanish, then ask if correct
+[reply]: Vale, gracias Isabel. Déjame confirmar tu nombre completo: Isabel Moreno. Eso sería Isabel, I, S, A, B, E, L, <break time="0.2s"/> y Moreno, M, O, R, E, N, O. ¿Está bien así, está correctamente escrito?
+
+--- Turn 2 · CUSTOMER (caller) ---
+Sí, está correcto, así está bien escrito.
+
+--- Turn 2 · ASSISTANT (agent) ---
+[thought]: close with brief thanks
+[reply]: Perfecto, gracias por confirmarlo.

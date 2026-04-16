@@ -1,0 +1,708 @@
+{
+  "version": 1,
+  "locale": "en",
+  "source": "test-names.en.json",
+  "generatedAt": "2026-04-16T02:00:18.737Z",
+  "entries": [
+    {
+      "id": "common-1",
+      "fullName": "James Smith",
+      "confirmationSentences": [
+        "Got it. Just to confirm, your first name is James — J-A-M-E-S — <break time=\"0.2s\"/> and your last name is Smith — S-M-I-T-H. Is that correct?"
+      ]
+    },
+    {
+      "id": "common-2",
+      "fullName": "Mary Johnson",
+      "confirmationSentences": [
+        "Got it. Just to confirm, your first name is Mary — M-A-R-Y — <break time=\"0.2s\"/> and your last name is Johnson — J-O-H-N-S-O-N. Is that correct?"
+      ]
+    },
+    {
+      "id": "common-3",
+      "fullName": "Robert Williams",
+      "confirmationSentences": [
+        "Got it. Just to confirm, your first name is Robert — R-O-B-E-R-T — <break time=\"0.2s\"/> and your last name is Williams — W-I-L-L-I-A-M-S. Is that correct?"
+      ]
+    },
+    {
+      "id": "common-4",
+      "fullName": "Patricia Brown",
+      "confirmationSentences": [
+        "Got it. Just to confirm, your first name is Patricia — P-A-T-R-I-C-I-A — <break time=\"0.2s\"/> and your last name is Brown — B-R-O-W-N. Is that correct?"
+      ]
+    },
+    {
+      "id": "common-5",
+      "fullName": "Michael Jones",
+      "confirmationSentences": [
+        "Got it. Just to confirm, your first name is Michael — M-I-C-H-A-E-L — <break time=\"0.2s\"/> and your last name is Jones — J-O-N-E-S. Is that correct?"
+      ]
+    },
+    {
+      "id": "common-6",
+      "fullName": "Linda Garcia",
+      "confirmationSentences": [
+        "Got it. Just to confirm, your first name is Linda — L-I-N-D-A — <break time=\"0.2s\"/> and your last name is Garcia — G-A-R-C-I-A. Is that correct?"
+      ]
+    },
+    {
+      "id": "common-7",
+      "fullName": "William Miller",
+      "confirmationSentences": [
+        "Got it. Just to confirm, your first name is William — W-I-L-L-I-A-M — <break time=\"0.2s\"/> and your last name is Miller — M-I-L-L-E-R. Is that correct?"
+      ]
+    },
+    {
+      "id": "common-8",
+      "fullName": "Barbara Davis",
+      "confirmationSentences": [
+        "Got it. Just to confirm, your first name is Barbara — B-A-R-B-A-R-A — <break time=\"0.2s\"/> and your last name is Davis — D-A-V-I-S. Is that correct?"
+      ]
+    },
+    {
+      "id": "common-9",
+      "fullName": "David Martinez",
+      "confirmationSentences": [
+        "Got it. Just to confirm, your first name is David — D-A-V-I-D — <break time=\"0.2s\"/> and your last name is Martinez — M-A-R-T-I-N-E-Z. Is that correct?"
+      ]
+    },
+    {
+      "id": "common-10",
+      "fullName": "Elizabeth Rodriguez",
+      "confirmationSentences": [
+        "Got it. Just to confirm, your first name is Elizabeth — E-L-I-Z-A-B-E-T-H — <break time=\"0.2s\"/> and your last name is Rodriguez — R-O-D-R-I-G-U-E-Z. Is that correct?"
+      ]
+    },
+    {
+      "id": "common-11",
+      "fullName": "Richard Wilson",
+      "confirmationSentences": [
+        "Got it. Just to confirm, your first name is Richard — R-I-C-H-A-R-D — <break time=\"0.2s\"/> and your last name is Wilson — W-I-L-S-O-N. Is that correct?"
+      ]
+    },
+    {
+      "id": "common-12",
+      "fullName": "Susan Anderson",
+      "confirmationSentences": [
+        "Got it. Just to confirm, your first name is Susan — S-U-S-A-N — <break time=\"0.2s\"/> and your last name is Anderson — A-N-D-E-R-S-O-N. Is that correct?"
+      ]
+    },
+    {
+      "id": "common-13",
+      "fullName": "Joseph Taylor",
+      "confirmationSentences": [
+        "Got it. Just to confirm, your first name is Joseph — J-O-S-E-P-H — <break time=\"0.2s\"/> and your last name is Taylor — T-A-Y-L-O-R. Is that correct?"
+      ]
+    },
+    {
+      "id": "common-14",
+      "fullName": "Jessica Thomas",
+      "confirmationSentences": [
+        "Got it. Just to confirm, your first name is Jessica — J-E-S-S-I-C-A — <break time=\"0.2s\"/> and your last name is Thomas — T-H-O-M-A-S. Is that correct?"
+      ]
+    },
+    {
+      "id": "common-15",
+      "fullName": "Thomas Moore",
+      "confirmationSentences": [
+        "Got it. Just to confirm, your first name is Thomas — T-H-O-M-A-S — <break time=\"0.2s\"/> and your last name is Moore — M-O-O-R-E. Is that correct?"
+      ]
+    },
+    {
+      "id": "common-16",
+      "fullName": "Karen Jackson",
+      "confirmationSentences": [
+        "Got it. Just to confirm, your first name is Karen — K-A-R-E-N — <break time=\"0.2s\"/> and your last name is Jackson — J-A-C-K-S-O-N. Is that correct?"
+      ]
+    },
+    {
+      "id": "common-17",
+      "fullName": "Charles Martin",
+      "confirmationSentences": [
+        "Got it. Just to confirm, your first name is Charles — C-H-A-R-L-E-S — <break time=\"0.2s\"/> and your last name is Martin — M-A-R-T-I-N. Is that correct?"
+      ]
+    },
+    {
+      "id": "common-18",
+      "fullName": "Nancy White",
+      "confirmationSentences": [
+        "Got it. Just to confirm, your first name is Nancy — N-A-N-C-Y — <break time=\"0.2s\"/> and your last name is White — W-H-I-T-E. Is that correct?"
+      ]
+    },
+    {
+      "id": "common-19",
+      "fullName": "Christopher Lee",
+      "confirmationSentences": [
+        "Got it. Just to confirm, your first name is Christopher — C-H-R-I-S-T-O-P-H-E-R — <break time=\"0.2s\"/> and your last name is Lee — L-E-E. Is that correct?"
+      ]
+    },
+    {
+      "id": "common-20",
+      "fullName": "Betty Harris",
+      "confirmationSentences": [
+        "Got it. Just to confirm, your first name is Betty — B-E-T-T-Y — <break time=\"0.2s\"/> and your last name is Harris — H-A-R-R-I-S. Is that correct?"
+      ]
+    },
+    {
+      "id": "common-21",
+      "fullName": "Daniel Lewis",
+      "confirmationSentences": [
+        "Got it. Just to confirm, your first name is Daniel — D-A-N-I-E-L — <break time=\"0.2s\"/> and your last name is Lewis — L-E-W-I-S. Is that correct?"
+      ]
+    },
+    {
+      "id": "common-22",
+      "fullName": "Margaret Robinson",
+      "confirmationSentences": [
+        "Got it. Just to confirm, your first name is Margaret — M-A-R-G-A-R-E-T — <break time=\"0.2s\"/> and your last name is Robinson — R-O-B-I-N-S-O-N. Is that correct?"
+      ]
+    },
+    {
+      "id": "common-23",
+      "fullName": "Matthew Walker",
+      "confirmationSentences": [
+        "Got it. Just to confirm, your first name is Matthew — M-A-T-T-H-E-W — <break time=\"0.2s\"/> and your last name is Walker — W-A-L-K-E-R. Is that correct?"
+      ]
+    },
+    {
+      "id": "common-24",
+      "fullName": "Sandra Young",
+      "confirmationSentences": [
+        "Got it. Just to confirm, your first name is Sandra — S-A-N-D-R-A — <break time=\"0.2s\"/> and your last name is Young — Y-O-U-N-G. Is that correct?"
+      ]
+    },
+    {
+      "id": "common-25",
+      "fullName": "Anthony Hall",
+      "confirmationSentences": [
+        "Got it. Just to confirm, your first name is Anthony — A-N-T-H-O-N-Y — <break time=\"0.2s\"/> and your last name is Hall — H-A-L-L. Is that correct?"
+      ]
+    },
+    {
+      "id": "common-26",
+      "fullName": "Ashley King",
+      "confirmationSentences": [
+        "Got it. Just to confirm, your first name is Ashley — A-S-H-L-E-Y — <break time=\"0.2s\"/> and your last name is King — K-I-N-G. Is that correct?"
+      ]
+    },
+    {
+      "id": "common-27",
+      "fullName": "Mark Wright",
+      "confirmationSentences": [
+        "Got it. Just to confirm, your first name is Mark — M-A-R-K — <break time=\"0.2s\"/> and your last name is Wright — W-R-I-G-H-T. Is that correct?"
+      ]
+    },
+    {
+      "id": "common-28",
+      "fullName": "Kimberly Lopez",
+      "confirmationSentences": [
+        "Got it. Just to confirm, your first name is Kimberly — K-I-M-B-E-R-L-Y — <break time=\"0.2s\"/> and your last name is Lopez — L-O-P-E-Z. Is that correct?"
+      ]
+    },
+    {
+      "id": "common-29",
+      "fullName": "Donald Hill",
+      "confirmationSentences": [
+        "Got it. Just to confirm, your first name is Donald — D-O-N-A-L-D — <break time=\"0.2s\"/> and your last name is Hill — H-I-L-L. Is that correct?"
+      ]
+    },
+    {
+      "id": "common-30",
+      "fullName": "Emily Scott",
+      "confirmationSentences": [
+        "Got it. Just to confirm, your first name is Emily — E-M-I-L-Y — <break time=\"0.2s\"/> and your last name is Scott — S-C-O-T-T. Is that correct?"
+      ]
+    },
+    {
+      "id": "common-31",
+      "fullName": "Steven Green",
+      "confirmationSentences": [
+        "Got it. Just to confirm, your first name is Steven — S-T-E-V-E-N — <break time=\"0.2s\"/> and your last name is Green — G-R-E-E-N. Is that correct?"
+      ]
+    },
+    {
+      "id": "common-32",
+      "fullName": "Donna Adams",
+      "confirmationSentences": [
+        "Got it. Just to confirm, your first name is Donna — D-O-N-N-A — <break time=\"0.2s\"/> and your last name is Adams — A-D-A-M-S. Is that correct?"
+      ]
+    },
+    {
+      "id": "common-33",
+      "fullName": "Paul Baker",
+      "confirmationSentences": [
+        "Got it. Just to confirm, your first name is Paul — P-A-U-L — <break time=\"0.2s\"/> and your last name is Baker — B-A-K-E-R. Is that correct?"
+      ]
+    },
+    {
+      "id": "common-34",
+      "fullName": "Carol Nelson",
+      "confirmationSentences": [
+        "Got it. Just to confirm, your first name is Carol — C-A-R-O-L — <break time=\"0.2s\"/> and your last name is Nelson — N-E-L-S-O-N. Is that correct?"
+      ]
+    },
+    {
+      "id": "common-35",
+      "fullName": "Andrew Carter",
+      "confirmationSentences": [
+        "Got it. Just to confirm, your first name is Andrew — A-N-D-R-E-W — <break time=\"0.2s\"/> and your last name is Carter — C-A-R-T-E-R. Is that correct?"
+      ]
+    },
+    {
+      "id": "common-36",
+      "fullName": "Michelle Mitchell",
+      "confirmationSentences": [
+        "Got it. Just to confirm, your first name is Michelle — M-I-C-H-E-L-L-E — <break time=\"0.2s\"/> and your last name is Mitchell — M-I-T-C-H-E-L-L. Is that correct?"
+      ]
+    },
+    {
+      "id": "common-37",
+      "fullName": "Joshua Perez",
+      "confirmationSentences": [
+        "Got it. Just to confirm, your first name is Joshua — J-O-S-H-U-A — <break time=\"0.2s\"/> and your last name is Perez — P-E-R-E-Z. Is that correct?"
+      ]
+    },
+    {
+      "id": "common-38",
+      "fullName": "Dorothy Roberts",
+      "confirmationSentences": [
+        "Got it. Just to confirm, your first name is Dorothy — D-O-R-O-T-H-Y — <break time=\"0.2s\"/> and your last name is Roberts — R-O-B-E-R-T-S. Is that correct?"
+      ]
+    },
+    {
+      "id": "common-39",
+      "fullName": "Kenneth Turner",
+      "confirmationSentences": [
+        "Got it. Just to confirm, your first name is Kenneth — K-E-N-N-E-T-H — <break time=\"0.2s\"/> and your last name is Turner — T-U-R-N-E-R. Is that correct?"
+      ]
+    },
+    {
+      "id": "common-40",
+      "fullName": "Sarah Phillips",
+      "confirmationSentences": [
+        "Got it. Just to confirm, your first name is Sarah — S-A-R-A-H — <break time=\"0.2s\"/> and your last name is Phillips — P-H-I-L-L-I-P-S. Is that correct?"
+      ]
+    },
+    {
+      "id": "common-41",
+      "fullName": "Kevin Campbell",
+      "confirmationSentences": [
+        "Got it. Just to confirm, your first name is Kevin — K-E-V-I-N — <break time=\"0.2s\"/> and your last name is Campbell — C-A-M-P-B-E-L-L. Is that correct?"
+      ]
+    },
+    {
+      "id": "common-42",
+      "fullName": "Deborah Parker",
+      "confirmationSentences": [
+        "Got it. Just to confirm, your first name is Deborah — D-E-B-O-R-A-H — <break time=\"0.2s\"/> and your last name is Parker — P-A-R-K-E-R. Is that correct?"
+      ]
+    },
+    {
+      "id": "common-43",
+      "fullName": "Brian Evans",
+      "confirmationSentences": [
+        "Got it. Just to confirm, your first name is Brian — B-R-I-A-N — <break time=\"0.2s\"/> and your last name is Evans — E-V-A-N-S. Is that correct?"
+      ]
+    },
+    {
+      "id": "common-44",
+      "fullName": "Laura Edwards",
+      "confirmationSentences": [
+        "Got it. Just to confirm, your first name is Laura — L-A-U-R-A — <break time=\"0.2s\"/> and your last name is Edwards — E-D-W-A-R-D-S. Is that correct?"
+      ]
+    },
+    {
+      "id": "common-45",
+      "fullName": "George Collins",
+      "confirmationSentences": [
+        "Got it. Just to confirm, your first name is George — G-E-O-R-G-E — <break time=\"0.2s\"/> and your last name is Collins — C-O-L-L-I-N-S. Is that correct?"
+      ]
+    },
+    {
+      "id": "common-46",
+      "fullName": "Rebecca Murphy",
+      "confirmationSentences": [
+        "Got it. Just to confirm, your first name is Rebecca — R-E-B-E-C-C-A — <break time=\"0.2s\"/> and your last name is Murphy — M-U-R-P-H-Y. Is that correct?"
+      ]
+    },
+    {
+      "id": "common-47",
+      "fullName": "Timothy Rivera",
+      "confirmationSentences": [
+        "Got it. Just to confirm, your first name is Timothy — T-I-M-O-T-H-Y — <break time=\"0.2s\"/> and your last name is Rivera — R-I-V-E-R-A. Is that correct?"
+      ]
+    },
+    {
+      "id": "common-48",
+      "fullName": "Sharon Cook",
+      "confirmationSentences": [
+        "Got it. Just to confirm, your first name is Sharon — S-H-A-R-O-N — <break time=\"0.2s\"/> and your last name is Cook — C-O-O-K. Is that correct?"
+      ]
+    },
+    {
+      "id": "common-49",
+      "fullName": "Jason Bailey",
+      "confirmationSentences": [
+        "Got it. Just to confirm, your first name is Jason — J-A-S-O-N — <break time=\"0.2s\"/> and your last name is Bailey — B-A-I-L-E-Y. Is that correct?"
+      ]
+    },
+    {
+      "id": "common-50",
+      "fullName": "Helen Cooper",
+      "confirmationSentences": [
+        "Got it. Just to confirm, your first name is Helen — H-E-L-E-N — <break time=\"0.2s\"/> and your last name is Cooper — C-O-O-P-E-R. Is that correct?"
+      ]
+    },
+    {
+      "id": "uncommon-1",
+      "fullName": "Quynh Nguyen",
+      "confirmationSentences": [
+        "Got it. Just to confirm, your first name is Quynh — Q-U-Y-N-H — <break time=\"0.2s\"/> and your last name is Nguyen — N-G-U-Y-E-N. Is that correct?"
+      ]
+    },
+    {
+      "id": "uncommon-2",
+      "fullName": "Priya Patel",
+      "confirmationSentences": [
+        "Got it. Just to confirm, your first name is Priya — P-R-I-Y-A — <break time=\"0.2s\"/> and your last name is Patel — P-A-T-E-L. Is that correct?"
+      ]
+    },
+    {
+      "id": "uncommon-3",
+      "fullName": "Lizhan Chen",
+      "confirmationSentences": [
+        "Got it. Just to confirm, your first name is Lizhan — L-I-Z-H-A-N — <break time=\"0.2s\"/> and your last name is Chen — C-H-E-N. Is that correct?"
+      ]
+    },
+    {
+      "id": "uncommon-4",
+      "fullName": "Saanvi Krishnan",
+      "confirmationSentences": [
+        "Got it. Just to confirm, your first name is Saanvi — S-A-A-N-V-I — <break time=\"0.2s\"/> and your last name is Krishnan — K-R-I-S-H-N-A-N. Is that correct?"
+      ]
+    },
+    {
+      "id": "uncommon-5",
+      "fullName": "Oleg Volkov",
+      "confirmationSentences": [
+        "Got it. Just to confirm, your first name is Oleg — O-L-E-G — <break time=\"0.2s\"/> and your last name is Volkov — V-O-L-K-O-V. Is that correct?"
+      ]
+    },
+    {
+      "id": "uncommon-6",
+      "fullName": "Fatima Al-Hassan",
+      "confirmationSentences": [
+        "Got it. Just to confirm, your first name is Fatima — F-A-T-I-M-A — <break time=\"0.2s\"/> and your last name is Al-Hassan — A-L-H-A-S-S-A-N. Is that correct?"
+      ]
+    },
+    {
+      "id": "uncommon-7",
+      "fullName": "Yuki Tanaka",
+      "confirmationSentences": [
+        "Got it. Just to confirm, your first name is Yuki — Y-U-K-I — <break time=\"0.2s\"/> and your last name is Tanaka — T-A-N-A-K-A. Is that correct?"
+      ]
+    },
+    {
+      "id": "uncommon-8",
+      "fullName": "Kwame Osei",
+      "confirmationSentences": [
+        "Got it. Just to confirm, your first name is Kwame — K-W-A-M-E — <break time=\"0.2s\"/> and your last name is Osei — O-S-E-I. Is that correct?"
+      ]
+    },
+    {
+      "id": "uncommon-9",
+      "fullName": "Magdalena Kowalski",
+      "confirmationSentences": [
+        "Got it. Just to confirm, your first name is Magdalena — M-A-G-D-A-L-E-N-A — <break time=\"0.2s\"/> and your last name is Kowalski — K-O-W-A-L-S-K-I. Is that correct?"
+      ]
+    },
+    {
+      "id": "uncommon-10",
+      "fullName": "Dmitri Sokolov",
+      "confirmationSentences": [
+        "Got it. Let me confirm, your first name is Dmitri — D-M-I-T-R-I — <break time=\"0.2s\"/> and your last name is Sokolov — S-O-K-O-L-O-V. Is that correct?"
+      ]
+    },
+    {
+      "id": "uncommon-11",
+      "fullName": "Ananya Iyer",
+      "confirmationSentences": [
+        "Got it. Just to confirm, your first name is Ananya — A-N-A-N-Y-A — <break time=\"0.2s\"/> and your last name is Iyer — I-Y-E-R. Is that correct?"
+      ]
+    },
+    {
+      "id": "uncommon-12",
+      "fullName": "Hiroshi Nakamura",
+      "confirmationSentences": [
+        "Got it. Just to confirm, your first name is Hiroshi — H-I-R-O-S-H-I — <break time=\"0.2s\"/> and your last name is Nakamura — N-A-K-A-M-U-R-A. Is that correct?"
+      ]
+    },
+    {
+      "id": "uncommon-13",
+      "fullName": "Elena Popescu",
+      "confirmationSentences": [
+        "Got it. Just to confirm, your first name is Elena — E-L-E-N-A — <break time=\"0.2s\"/> and your last name is Popescu — P-O-P-E-S-C-U. Is that correct?"
+      ]
+    },
+    {
+      "id": "uncommon-14",
+      "fullName": "Jakub Novák",
+      "confirmationSentences": [
+        "Got it. Let me confirm, your first name is Jakub — J-A-K-U-B — <break time=\"0.2s\"/> and your last name is Novak — N-O-V-A-K. Is that correct?"
+      ]
+    },
+    {
+      "id": "uncommon-15",
+      "fullName": "Min-jun Park",
+      "confirmationSentences": [
+        "Got it. Just to confirm, your first name is Min-jun — M-I-N-J-U-N — <break time=\"0.2s\"/> and your last name is Park — P-A-R-K. Is that correct?"
+      ]
+    },
+    {
+      "id": "uncommon-16",
+      "fullName": "Asha Menon",
+      "confirmationSentences": [
+        "Got it. Just to confirm, your first name is Asha — A-S-H-A — <break time=\"0.2s\"/> and your last name is Menon — M-E-N-O-N. Is that correct?"
+      ]
+    },
+    {
+      "id": "uncommon-17",
+      "fullName": "Björn Lindström",
+      "confirmationSentences": [
+        "Got it. Let me confirm, your first name is Björn — B-J-Ö-R-N — <break time=\"0.2s\"/> and your last name is Lindström — L-I-N-D-S-T-R-Ö-M. Is that correct?"
+      ]
+    },
+    {
+      "id": "uncommon-18",
+      "fullName": "Zainab El-Amin",
+      "confirmationSentences": [
+        "Got it. Just to confirm, your first name is Zainab — Z-A-I-N-A-B — <break time=\"0.2s\"/> and your last name is El-Amin — E-L-A-M-I-N. Is that correct?"
+      ]
+    },
+    {
+      "id": "uncommon-19",
+      "fullName": "Thi Mai Tran",
+      "confirmationSentences": [
+        "Got it. Just to confirm, your first name is Thi — T-H-I — <break time=\"0.2s\"/> and your last name is Tran — T-R-A-N. Is that correct?"
+      ]
+    },
+    {
+      "id": "uncommon-20",
+      "fullName": "Aleksandr Petrov",
+      "confirmationSentences": [
+        "Got it. Just to confirm, your first name is Aleksandr — A-L-E-K-S-A-N-D-R — <break time=\"0.2s\"/> and your last name is Petrov — P-E-T-R-O-V. Is that correct?"
+      ]
+    },
+    {
+      "id": "uncommon-21",
+      "fullName": "Ngozi Okonkwo",
+      "confirmationSentences": [
+        "Got it. Let me confirm, your first name is Ngozi — N-G-O-Z-I — <break time=\"0.2s\"/> and your last name is Okonkwo — O-K-O-N-K-W-O. Is that correct?"
+      ]
+    },
+    {
+      "id": "uncommon-22",
+      "fullName": "Rafael Costa-Silva",
+      "confirmationSentences": [
+        "Got it. Just to confirm, your first name is Rafael — R-A-F-A-E-L — <break time=\"0.2s\"/> and your last name is Costa-Silva — C-O-S-T-A, hyphen, S-I-L-V-A. Is that correct?"
+      ]
+    },
+    {
+      "id": "uncommon-23",
+      "fullName": "Mei-Ling Wong",
+      "confirmationSentences": [
+        "Got it. Just to confirm, your first name is Mei-Ling — M-E-I-L-I-N-G — <break time=\"0.2s\"/> and your last name is Wong — W-O-N-G. Is that correct?"
+      ]
+    },
+    {
+      "id": "uncommon-24",
+      "fullName": "Tariq Rahman",
+      "confirmationSentences": [
+        "Got it. Just to confirm, your first name is Tariq — T-A-R-I-Q — <break time=\"0.2s\"/> and your last name is Rahman — R-A-H-M-A-N. Is that correct?"
+      ]
+    },
+    {
+      "id": "uncommon-25",
+      "fullName": "Ingrid Jónsdóttir",
+      "confirmationSentences": [
+        "Got it. Just to confirm, your first name is Ingrid — I-N-G-R-I-D — <break time=\"0.2s\"/> and your last name is Jonsdottir — J-O-N-S-D-O-T-T-I-R. Is that correct?"
+      ]
+    },
+    {
+      "id": "uncommon-26",
+      "fullName": "Sanjay Gupta",
+      "confirmationSentences": [
+        "Got it. Just to confirm, your first name is Sanjay — S-A-N-J-A-Y — <break time=\"0.2s\"/> and your last name is Gupta — G-U-P-T-A. Is that correct?"
+      ]
+    },
+    {
+      "id": "uncommon-27",
+      "fullName": "Ludmila Vasquez",
+      "confirmationSentences": [
+        "Got it. Just to confirm, your first name is Ludmila — L-U-D-M-I-L-A — <break time=\"0.2s\"/> and your last name is Vasquez — V-A-S-Q-U-E-Z. Is that correct?"
+      ]
+    },
+    {
+      "id": "uncommon-28",
+      "fullName": "Kenji Yamamoto",
+      "confirmationSentences": [
+        "Got it. Just to confirm, your first name is Kenji — K-E-N-J-I — <break time=\"0.2s\"/> and your last name is Yamamoto — Y-A-M-A-M-O-T-O. Is that correct?"
+      ]
+    },
+    {
+      "id": "uncommon-29",
+      "fullName": "Amara Diallo",
+      "confirmationSentences": [
+        "Got it. Just to confirm, your first name is Amara — A-M-A-R-A — <break time=\"0.2s\"/> and your last name is Diallo — D-I-A-L-L-O. Is that correct?"
+      ]
+    },
+    {
+      "id": "uncommon-30",
+      "fullName": "Viktor Horváth",
+      "confirmationSentences": [
+        "Got it. Let me confirm, your first name is Viktor — V-I-K-T-O-R — <break time=\"0.2s\"/> and your last name is Horváth — H-O-R-V-Á-T-H. Is that correct?"
+      ]
+    },
+    {
+      "id": "uncommon-31",
+      "fullName": "Soraya Benali",
+      "confirmationSentences": [
+        "Got it. Just to confirm, your first name is Soraya — S-O-R-A-Y-A — <break time=\"0.2s\"/> and your last name is Benali — B-E-N-A-L-I. Is that correct?"
+      ]
+    },
+    {
+      "id": "uncommon-32",
+      "fullName": "Chen Wei",
+      "confirmationSentences": [
+        "Got it. Just to confirm, your first name is Chen — C-H-E-N — <break time=\"0.2s\"/> and your last name is Wei — W-E-I. Is that correct?"
+      ]
+    },
+    {
+      "id": "uncommon-33",
+      "fullName": "Olga Chernov",
+      "confirmationSentences": [
+        "Got it. Just to confirm, your first name is Olga — O-L-G-A — <break time=\"0.2s\"/> and your last name is Chernov — C-H-E-R-N-O-V. Is that correct?"
+      ]
+    },
+    {
+      "id": "uncommon-34",
+      "fullName": "Jamal Haddad",
+      "confirmationSentences": [
+        "Got it. Just to confirm, your first name is Jamal — J-A-M-A-L — <break time=\"0.2s\"/> and your last name is Haddad — H-A-D-D-A-D. Is that correct?"
+      ]
+    },
+    {
+      "id": "uncommon-35",
+      "fullName": "Keiko Fujimura",
+      "confirmationSentences": [
+        "Got it. Just to confirm, your first name is Keiko — K-E-I-K-O — <break time=\"0.2s\"/> and your last name is Fujimura — F-U-J-I-M-U-R-A. Is that correct?"
+      ]
+    },
+    {
+      "id": "uncommon-36",
+      "fullName": "Ivan Horvat",
+      "confirmationSentences": [
+        "Got it. Just to confirm, your first name is Ivan — I-V-A-N — <break time=\"0.2s\"/> and your last name is Horvat — H-O-R-V-A-T. Is that correct?"
+      ]
+    },
+    {
+      "id": "uncommon-37",
+      "fullName": "Aisha Osman",
+      "confirmationSentences": [
+        "Got it. Just to confirm, your first name is Aisha — A-I-S-H-A — <break time=\"0.2s\"/> and your last name is Osman — O-S-M-A-N. Is that correct?"
+      ]
+    },
+    {
+      "id": "uncommon-38",
+      "fullName": "Gustavo Ribeiro",
+      "confirmationSentences": [
+        "Got it. Just to confirm, your first name is Gustavo — G-U-S-T-A-V-O — <break time=\"0.2s\"/> and your last name is Ribeiro — R-I-B-E-I-R-O. Is that correct?"
+      ]
+    },
+    {
+      "id": "uncommon-39",
+      "fullName": "Nadia El-Masri",
+      "confirmationSentences": [
+        "Got it. Just to confirm, your first name is Nadia — N-A-D-I-A — <break time=\"0.2s\"/> and your last name is El-Masri — E-L-M-A-S-R-I. Is that correct?"
+      ]
+    },
+    {
+      "id": "uncommon-40",
+      "fullName": "Pavel Dvorak",
+      "confirmationSentences": [
+        "Got it. Just to confirm, your first name is Pavel — P-A-V-E-L — <break time=\"0.2s\"/> and your last name is Dvorak — D-V-O-R-A-K. Is that correct?"
+      ]
+    },
+    {
+      "id": "uncommon-41",
+      "fullName": "Leila Farah",
+      "confirmationSentences": [
+        "Got it. Just to confirm, your first name is Leila — L-E-I-L-A — <break time=\"0.2s\"/> and your last name is Farah — F-A-R-A-H. Is that correct?"
+      ]
+    },
+    {
+      "id": "uncommon-42",
+      "fullName": "Hassan Abbasi",
+      "confirmationSentences": [
+        "Got it. Just to confirm, your first name is Hassan — H-A-S-S-A-N — <break time=\"0.2s\"/> and your last name is Abbasi — A-B-B-A-S-I. Is that correct?"
+      ]
+    },
+    {
+      "id": "uncommon-43",
+      "fullName": "Irina Popov",
+      "confirmationSentences": [
+        "Got it. Just to confirm, your first name is Irina — I-R-I-N-A — <break time=\"0.2s\"/> and your last name is Popov — P-O-P-O-V. Is that correct?"
+      ]
+    },
+    {
+      "id": "uncommon-44",
+      "fullName": "Javier Muñoz",
+      "confirmationSentences": [
+        "Got it. Just to confirm, your first name is Javier — J-A-V-I-E-R — <break time=\"0.2s\"/> and your last name is Muñoz — M-U-Ñ-O-Z. Is that correct?"
+      ]
+    },
+    {
+      "id": "uncommon-45",
+      "fullName": "Lin Zhao",
+      "confirmationSentences": [
+        "Got it. Just to confirm, your first name is Lin — L-I-N — <break time=\"0.2s\"/> and your last name is Zhao — Z-H-A-O. Is that correct?"
+      ]
+    },
+    {
+      "id": "uncommon-46",
+      "fullName": "Mikael Björklund",
+      "confirmationSentences": [
+        "Got it. Just to confirm, your first name is Mikael — M-I-K-A-E-L — <break time=\"0.2s\"/> and your last name is Björklund — B-J-Ö-R-K-L-U-N-D. Is that correct?"
+      ]
+    },
+    {
+      "id": "uncommon-47",
+      "fullName": "Rashid Karim",
+      "confirmationSentences": [
+        "Got it. Just to confirm, your first name is Rashid — R-A-S-H-I-D — <break time=\"0.2s\"/> and your last name is Karim — K-A-R-I-M. Is that correct?"
+      ]
+    },
+    {
+      "id": "uncommon-48",
+      "fullName": "Svetlana Ivanova",
+      "confirmationSentences": [
+        "Got it. Just to confirm, your first name is Svetlana — S-V-E-T-L-A-N-A — <break time=\"0.2s\"/> and your last name is Ivanova — I-V-A-N-O-V-A. Is that correct?"
+      ]
+    },
+    {
+      "id": "uncommon-49",
+      "fullName": "Arjun Deshpande",
+      "confirmationSentences": [
+        "Got it. Just to confirm, your first name is Arjun — A-R-J-U-N — <break time=\"0.2s\"/> and your last name is Deshpande — D-E-S-H-P-A-N-D-E. Is that correct?"
+      ]
+    },
+    {
+      "id": "uncommon-50",
+      "fullName": "Youssef Mansour",
+      "confirmationSentences": [
+        "Got it. Let me confirm, your first name is Youssef — Y-O-U-S-S-E-F — <break time=\"0.2s\"/> and your last name is Mansour — M-A-N-S-O-U-R. Is that correct?"
+      ]
+    }
+  ]
+}

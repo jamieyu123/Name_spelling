@@ -8,7 +8,9 @@
  *   4) AI customer: spells the name
  *   5) AI assistant: one reply = spelling confirmation per askNamePrompt → stdout is that sentence only
  *
- * Usage: node scripts/simulate-loop.mjs [--locale es|en] [--id …] | --write-confirmation-json [--locale es|en] [--out-dir …]
+ * Usage: node scripts/simulate-loop.mjs [--locale es|en] [--id …] | --write-confirmation-json [--locale es|en] [--out-dir …] [--confirmation-out <filename>]
+ * Confirmation JSON always uses askNamePrompt from ../lib/prompts.js (current file).
+ * Default output: data/simulation-confirmation_sentences.en.json or .es.json. Override: --confirmation-out simulation-confirmation_sentences-old-prompt.en.json
  * Env: OPENAI_API_KEY; optional SIMULATE_MODEL (default gpt-4o-mini)
  */
 import "dotenv/config";
@@ -36,21 +38,24 @@ const SPELL_REQUEST = {
 /** Last assistant turn: only produce the confirmation line; no extra turns after. */
 const SIMULATION_SCOPE_CONFIRM = `This is the continuation of a name-collection call. The caller already gave their spoken name and then spelled it letter by letter. Your ONLY job in this reply is to confirm the spelling in one response, following your name-collection instructions (askNamePrompt). Output exactly one [reply] with that confirmation. Do not ask for more spelling. Do not add a thanks-after-yes (there is no next turn).`;
 
-const SESSION_LANGUAGE_SPANISH = `Session language: Spanish. Write the confirmation in Spanish using Spanish letter names (nombre de letra) per askNamePrompt §14 — not English or NATO.`;
+const SESSION_LANGUAGE_SPANISH = `Session language: Spanish. Write the confirmation in Spanish; spell names using Spanish letter names (nombre de letra: a, be, ce, erre, jota, etc.) — not English letter names or NATO.`;
 
 function parseCommandLine(argv) {
   let locale = "en";
   let id = null;
   let writeConfirmationJson = false;
   let outDir = path.join(root, "data");
+  /** Optional output basename or path for --write-confirmation-json (default: simulation-confirmation_sentences.<locale>.json). */
+  let confirmationOut = null;
   for (let i = 0; i < argv.length; i++) {
     if (argv[i] === "--locale" && argv[i + 1]) {
       locale = argv[++i];
     } else if (argv[i] === "--id" && argv[i + 1]) id = argv[++i];
     else if (argv[i] === "--write-confirmation-json") writeConfirmationJson = true;
     else if (argv[i] === "--out-dir" && argv[i + 1]) outDir = path.resolve(argv[++i]);
+    else if (argv[i] === "--confirmation-out" && argv[i + 1]) confirmationOut = argv[++i];
   }
-  return { locale, id, outDir, writeConfirmationJson };
+  return { locale, id, outDir, writeConfirmationJson, confirmationOut };
 }
 
 function loadNameEntries(locale) {
@@ -149,12 +154,19 @@ async function runOneSimulation(openai, { locale, id, fullName }, sinks) {
   logErr("=== Done (fixed flow: name → spell request → spelling → confirmation). ===\n");
 }
 
-async function writeConfirmationJsonForLocale(openai, outDir, locale) {
-  fs.mkdirSync(outDir, { recursive: true });
+function defaultConfirmationJsonName(locale) {
+  return locale === "es" ? "simulation-confirmation_sentences.es.json" : "simulation-confirmation_sentences.en.json";
+}
+
+async function writeConfirmationJsonForLocale(openai, outDir, locale, confirmationOutFile) {
   const entries = loadNameEntries(locale);
   const sourceFile = locale === "es" ? "test-names.es.json" : "test-names.en.json";
-  const outFile =
-    locale === "es" ? "simulation-confirmation_sentences.es.json" : "simulation-confirmation_sentences.en.json";
+  const outFile = confirmationOutFile
+    ? path.isAbsolute(confirmationOutFile)
+      ? confirmationOutFile
+      : path.join(outDir, confirmationOutFile)
+    : path.join(outDir, defaultConfirmationJsonName(locale));
+  fs.mkdirSync(path.dirname(outFile), { recursive: true });
   const payload = {
     version: 1,
     locale,
@@ -178,13 +190,14 @@ async function writeConfirmationJsonForLocale(openai, outDir, locale) {
     });
   }
 
-  const outPath = path.join(outDir, outFile);
-  fs.writeFileSync(outPath, JSON.stringify(payload, null, 2), "utf8");
-  console.error(`Wrote ${payload.entries.length} entries to ${outPath}`);
+  fs.writeFileSync(outFile, JSON.stringify(payload, null, 2), "utf8");
+  console.error(`Wrote ${payload.entries.length} entries to ${outFile}`);
 }
 
 async function main() {
-  const { locale, id: idFromCli, outDir, writeConfirmationJson } = parseCommandLine(process.argv.slice(2));
+  const { locale, id: idFromCli, outDir, writeConfirmationJson, confirmationOut } = parseCommandLine(
+    process.argv.slice(2),
+  );
 
   if (!process.env.OPENAI_API_KEY) {
     console.error("Missing OPENAI_API_KEY in environment.");
@@ -194,7 +207,7 @@ async function main() {
   const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
   if (writeConfirmationJson) {
-    await writeConfirmationJsonForLocale(openai, outDir, locale);
+    await writeConfirmationJsonForLocale(openai, outDir, locale, confirmationOut);
     return;
   }
 

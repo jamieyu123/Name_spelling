@@ -5,7 +5,8 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "simulate": "node scripts/simulate-loop.mjs"
+    "simulate": "node scripts/simulate-loop.mjs",
+    "tts-all": "node scripts/simulate-loop.mjs --write-tts-all"
   },
   "keywords": [],
   "author": "",

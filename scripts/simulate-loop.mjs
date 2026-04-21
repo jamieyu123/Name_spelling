@@ -1,29 +1,24 @@
-/**
- * Fixed short simulation: AI caller (name from test-names.en.json or test-names.es.json) + AI assistant.
- *
- * Turns (no loop, no MAX_TURNS):
- *   1) Assistant opener (fixed): "Hi, could I get your first and last name, please?"
- *   2) AI customer: says the name from JSON (spoken, no letter-by-letter yet)
- *   3) Assistant spell request (fixed string, not generated): ask to spell first and last letter by letter
- *   4) AI customer: spells the name
- *   5) AI assistant: one reply = spelling confirmation per askNamePrompt → stdout is that sentence only
- *
- * Usage: node scripts/simulate-loop.mjs [--locale es|en] [--id …] | --write-confirmation-json [--locale es|en] [--out-dir …] [--confirmation-out <filename>]
- * Confirmation JSON always uses askNamePrompt from ../lib/prompts.js (current file).
- * Default output: data/simulation-confirmation_sentences.en.json or .es.json. Override: --confirmation-out simulation-confirmation_sentences-old-prompt.en.json
- * Env: OPENAI_API_KEY; optional SIMULATE_MODEL (default gpt-4o-mini)
- */
+/** AI caller + assistant → confirmation (stdout). OPENAI_API_KEY; CARTISIA_API_KEY for TTS. */
 import "dotenv/config";
 import fs from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
 import OpenAI from "openai";
+import { getCartesiaApiKey, synthesizeCartesiaBytes } from "../lib/cartesia-tts.js";
 import { systemPersona, askNamePrompt, replyFormat } from "../lib/prompts.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const root = path.join(__dirname, "..");
-
 const MODEL = process.env.SIMULATE_MODEL ?? "gpt-4o-mini";
+const dataDir = (locale) => path.join(root, "data", locale);
+
+const CARTESIA_REST = {
+  model_id: "sonic-3",
+  voice: { mode: "id", id: "86e30c1d-714b-4074-a1f2-1cb6b552fb49" },
+  output_format: { container: "wav", encoding: "pcm_f32le", sample_rate: 44100 },
+  generation_config: { speed: 1, volume: 1.2, emotion: "neutral" },
+  cartesiaVersion: "2025-04-16",
+};
 
 const ASSISTANT_OPENER_BY_LOCALE = {
   en: "Hi, could I get your first and last name, please?",
@@ -35,27 +30,55 @@ const SPELL_REQUEST = {
   es: "Gracias — ¿podría deletrear su nombre y apellido, letra por letra?",
 };
 
-/** Last assistant turn: only produce the confirmation line; no extra turns after. */
 const SIMULATION_SCOPE_CONFIRM = `This is the continuation of a name-collection call. The caller already gave their spoken name and then spelled it letter by letter. Your ONLY job in this reply is to confirm the spelling in one response, following your name-collection instructions (askNamePrompt). Output exactly one [reply] with that confirmation. Do not ask for more spelling. Do not add a thanks-after-yes (there is no next turn).`;
 
 const SESSION_LANGUAGE_SPANISH = `Session language: Spanish. Write the confirmation in Spanish; spell names using Spanish letter names (nombre de letra: a, be, ce, erre, jota, etc.) — not English letter names or NATO.`;
+
+const stripSsmlBreaks = (s) => s.replace(/<\s*break\b[^>]*\/?\s*>/gi, " ").replace(/\s+/g, " ").trim();
+
+async function cartesiaWavBytes(spoken, locale) {
+  return synthesizeCartesiaBytes(stripSsmlBreaks(spoken), {
+    modelId: CARTESIA_REST.model_id,
+    voice: CARTESIA_REST.voice,
+    language: locale === "es" ? "es" : "en",
+    apiVersion: CARTESIA_REST.cartesiaVersion,
+    outputFormat: CARTESIA_REST.output_format,
+    generationConfig: CARTESIA_REST.generation_config,
+  });
+}
+
+async function chatComplete(openai, messages, temperature) {
+  const res = await openai.chat.completions.create({
+    model: MODEL,
+    reasoning_effort: "none",
+    temperature,
+    messages,
+  });
+  return res.choices[0]?.message?.content ?? "";
+}
 
 function parseCommandLine(argv) {
   let locale = "en";
   let id = null;
   let writeConfirmationJson = false;
+  let writeTtsBatch = false;
+  let writeTtsAllLocales = false;
   let outDir = path.join(root, "data");
-  /** Optional output basename or path for --write-confirmation-json (default: simulation-confirmation_sentences.<locale>.json). */
   let confirmationOut = null;
+  let ttsOut = null;
+  let ttsOutDir = null;
   for (let i = 0; i < argv.length; i++) {
-    if (argv[i] === "--locale" && argv[i + 1]) {
-      locale = argv[++i];
-    } else if (argv[i] === "--id" && argv[i + 1]) id = argv[++i];
+    if (argv[i] === "--locale" && argv[i + 1]) locale = argv[++i];
+    else if (argv[i] === "--id" && argv[i + 1]) id = argv[++i];
     else if (argv[i] === "--write-confirmation-json") writeConfirmationJson = true;
+    else if (argv[i] === "--write-tts-batch") writeTtsBatch = true;
+    else if (argv[i] === "--write-tts-all") writeTtsAllLocales = true;
     else if (argv[i] === "--out-dir" && argv[i + 1]) outDir = path.resolve(argv[++i]);
     else if (argv[i] === "--confirmation-out" && argv[i + 1]) confirmationOut = argv[++i];
+    else if (argv[i] === "--tts-out" && argv[i + 1]) ttsOut = argv[++i];
+    else if (argv[i] === "--tts-out-dir" && argv[i + 1]) ttsOutDir = path.resolve(argv[++i]);
   }
-  return { locale, id, outDir, writeConfirmationJson, confirmationOut };
+  return { locale, id, outDir, writeConfirmationJson, writeTtsBatch, writeTtsAllLocales, confirmationOut, ttsOut, ttsOutDir };
 }
 
 function loadNameEntries(locale) {
@@ -93,69 +116,52 @@ function buildCustomerSystemPrompt(fullName, locale) {
   ].join("\n");
 }
 
-function heardAgentPrompt(spokenText) {
-  return `The agent just said (this is what you heard on the phone):\n"${spokenText}"\n\nWhat do you say next?`;
-}
-
 async function runOneSimulation(openai, { locale, id, fullName }, sinks) {
-  const log = sinks.log;
-  const logErr = sinks.logErr;
   const spellRequest = locale === "es" ? SPELL_REQUEST.es : SPELL_REQUEST.en;
   const assistantOpener = ASSISTANT_OPENER_BY_LOCALE[locale] ?? ASSISTANT_OPENER_BY_LOCALE.en;
-
-  logErr(`\n=== Simulation: locale=${locale}  id=${id}  name="${fullName}" ===\n`);
-
   const customerSystem = buildCustomerSystemPrompt(fullName, locale);
+  const heard = (t) =>
+    `The agent just said (this is what you heard on the phone):\n"${t}"\n\nWhat do you say next?`;
 
-  const cust1 = await openai.chat.completions.create({
-    model: MODEL,
-    reasoning_effort: "none",
-    temperature: 0.7,
-    messages: [
+  sinks.logErr(`\n=== Simulation: locale=${locale}  id=${id}  name="${fullName}" ===\n`);
+
+  const customerSaysName = await chatComplete(
+    openai,
+    [
       { role: "system", content: customerSystem },
-      { role: "user", content: heardAgentPrompt(assistantOpener) },
+      { role: "user", content: heard(assistantOpener) },
     ],
-  });
-  const customerSaysName = cust1.choices[0]?.message?.content ?? "";
-
-  const cust2 = await openai.chat.completions.create({
-    model: MODEL,
-    reasoning_effort: "none",
-    temperature: 0.4,
-    messages: [
+    0.7,
+  );
+  const customerSpells = await chatComplete(
+    openai,
+    [
       { role: "system", content: customerSystem },
-      { role: "user", content: heardAgentPrompt(spellRequest) },
+      { role: "user", content: heard(spellRequest) },
     ],
-  });
-  const customerSpells = cust2.choices[0]?.message?.content ?? "";
+    0.4,
+  );
 
-  const assistantSystemMessages = [
-    { role: "system", content: systemPersona },
-    { role: "system", content: askNamePrompt },
-    { role: "system", content: replyFormat },
-    ...(locale === "es" ? [{ role: "system", content: SESSION_LANGUAGE_SPANISH }] : []),
-    { role: "system", content: SIMULATION_SCOPE_CONFIRM },
-    { role: "assistant", content: assistantOpener },
-    { role: "user", content: customerSaysName },
-    { role: "assistant", content: spellRequest },
-    { role: "user", content: customerSpells },
-  ];
-
-  const asstRes = await openai.chat.completions.create({
-    model: MODEL,
-    reasoning_effort: "none",
-    temperature: 0.4,
-    messages: assistantSystemMessages,
-  });
-  const assistantRaw = asstRes.choices[0]?.message?.content ?? "";
+  const assistantRaw = await chatComplete(
+    openai,
+    [
+      { role: "system", content: systemPersona },
+      { role: "system", content: askNamePrompt },
+      { role: "system", content: replyFormat },
+      ...(locale === "es" ? [{ role: "system", content: SESSION_LANGUAGE_SPANISH }] : []),
+      { role: "system", content: SIMULATION_SCOPE_CONFIRM },
+      { role: "assistant", content: assistantOpener },
+      { role: "user", content: customerSaysName },
+      { role: "assistant", content: spellRequest },
+      { role: "user", content: customerSpells },
+    ],
+    0.4,
+  );
   const spoken = extractSpokenReply(assistantRaw);
 
-  log(spoken);
-  logErr("=== Done (fixed flow: name → spell request → spelling → confirmation). ===\n");
-}
-
-function defaultConfirmationJsonName(locale) {
-  return locale === "es" ? "simulation-confirmation_sentences.es.json" : "simulation-confirmation_sentences.en.json";
+  sinks.log(spoken);
+  sinks.logErr("=== Done (fixed flow: name → spell request → spelling → confirmation). ===\n");
+  return spoken;
 }
 
 async function writeConfirmationJsonForLocale(openai, outDir, locale, confirmationOutFile) {
@@ -165,15 +171,12 @@ async function writeConfirmationJsonForLocale(openai, outDir, locale, confirmati
     ? path.isAbsolute(confirmationOutFile)
       ? confirmationOutFile
       : path.join(outDir, confirmationOutFile)
-    : path.join(outDir, defaultConfirmationJsonName(locale));
+    : path.join(
+        outDir,
+        locale === "es" ? "simulation-confirmation_sentences.es.json" : "simulation-confirmation_sentences.en.json",
+      );
   fs.mkdirSync(path.dirname(outFile), { recursive: true });
-  const payload = {
-    version: 1,
-    locale,
-    source: sourceFile,
-    generatedAt: new Date().toISOString(),
-    entries: [],
-  };
+  const payload = { version: 1, locale, source: sourceFile, generatedAt: new Date().toISOString(), entries: [] };
 
   for (let i = 0; i < entries.length; i++) {
     const entry = entries[i];
@@ -183,40 +186,89 @@ async function writeConfirmationJsonForLocale(openai, outDir, locale, confirmati
       log: (s) => sentences.push(s),
       logErr: () => {},
     });
-    payload.entries.push({
-      id: entry.id,
-      fullName: entry.fullName,
-      confirmationSentences: sentences,
-    });
+    payload.entries.push({ id: entry.id, fullName: entry.fullName, confirmationSentences: sentences });
   }
 
   fs.writeFileSync(outFile, JSON.stringify(payload, null, 2), "utf8");
   console.error(`Wrote ${payload.entries.length} entries to ${outFile}`);
 }
 
-async function main() {
-  const { locale, id: idFromCli, outDir, writeConfirmationJson, confirmationOut } = parseCommandLine(
-    process.argv.slice(2),
-  );
-
-  if (!process.env.OPENAI_API_KEY) {
-    console.error("Missing OPENAI_API_KEY in environment.");
-    process.exit(1);
+async function writeTtsWavForLocale(openai, locale, dir) {
+  const entries = loadNameEntries(locale);
+  fs.mkdirSync(dir, { recursive: true });
+  let wrote = 0;
+  for (let i = 0; i < entries.length; i++) {
+    const entry = entries[i];
+    process.stderr.write(`[${i + 1}/${entries.length}] ${locale} ${entry.id} "${entry.fullName}" …\n`);
+    const spoken = await runOneSimulation(openai, { locale, id: entry.id, fullName: entry.fullName }, {
+      log: () => {},
+      logErr: () => {},
+    });
+    if (!spoken?.trim()) {
+      console.error(`  skip (empty confirmation): ${entry.id}`);
+      continue;
+    }
+    fs.writeFileSync(path.join(dir, `${entry.id}.wav`), await cartesiaWavBytes(spoken, locale));
+    wrote += 1;
   }
+  console.error(`Wrote ${wrote} WAV file(s) under ${dir}`);
+}
+
+function bail(msg) {
+  console.error(msg);
+  process.exit(1);
+}
+
+async function main() {
+  const {
+    locale,
+    id: idFromCli,
+    outDir,
+    writeConfirmationJson,
+    writeTtsBatch,
+    writeTtsAllLocales,
+    confirmationOut,
+    ttsOut,
+    ttsOutDir,
+  } = parseCommandLine(process.argv.slice(2));
+
+  if (!process.env.OPENAI_API_KEY) bail("Missing OPENAI_API_KEY in environment.");
+
+  const anyTts = ttsOut || writeTtsBatch || writeTtsAllLocales;
+  if (writeConfirmationJson && anyTts) bail("Cannot combine --write-confirmation-json with TTS flags.");
+  if (ttsOut && (writeTtsBatch || writeTtsAllLocales)) bail("Use either --tts-out or batch TTS flags, not both.");
+  if (writeTtsBatch && writeTtsAllLocales) bail("Use either --write-tts-batch or --write-tts-all, not both.");
+  if (anyTts && !getCartesiaApiKey()) bail("Missing CARTISIA_API_KEY for TTS.");
 
   const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
+  if (writeTtsAllLocales) {
+    await writeTtsWavForLocale(openai, "en", dataDir("en"));
+    await writeTtsWavForLocale(openai, "es", dataDir("es"));
+    return;
+  }
+  if (writeTtsBatch) {
+    await writeTtsWavForLocale(openai, locale, ttsOutDir ?? dataDir(locale));
+    return;
+  }
   if (writeConfirmationJson) {
     await writeConfirmationJsonForLocale(openai, outDir, locale, confirmationOut);
     return;
   }
 
   const { id, fullName } = pickNameEntry(loadNameEntries(locale), idFromCli);
-
-  await runOneSimulation(openai, { locale, id, fullName }, {
+  const spoken = await runOneSimulation(openai, { locale, id, fullName }, {
     log: console.log.bind(console),
     logErr: console.error.bind(console),
   });
+
+  if (ttsOut && spoken?.trim()) {
+    const outPath = path.resolve(ttsOut);
+    const ttsDir = path.dirname(outPath);
+    if (ttsDir) fs.mkdirSync(ttsDir, { recursive: true });
+    fs.writeFileSync(outPath, await cartesiaWavBytes(spoken, locale));
+    console.error(`Wrote TTS → ${outPath}`);
+  }
 }
 
 main().catch((err) => {

@@ -6,13 +6,15 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "simulate": "node scripts/simulate-loop.mjs",
-    "tts-all": "node scripts/simulate-loop.mjs --write-tts-all"
+    "tts-all": "node scripts/simulate-loop.mjs --write-tts-all",
+    "tts-elevenlabs-names": "node scripts/elevenlabs-tts-test-names.mjs"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "type": "module",
   "dependencies": {
+    "@elevenlabs/elevenlabs-js": "^2.45.0",
     "dotenv": "^17.4.1",
     "openai": "^6.34.0"
   }

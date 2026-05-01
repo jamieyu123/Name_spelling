@@ -1,39 +1,47 @@
 /**
- * Name simulation + ElevenLabs TTS. JSON → out/elevenlabs/text/; batch MP3 → out/elevenlabs/tts/{en|es}/.
- * OPENAI_API_KEY; ELEVENLABS_API_KEY for TTS. JSON + batch TTS: EN 10+10 common/uncommon, ES full (override EN with --en-head-each; --limit caps batch).
+ * Name simulation + Cartesia TTS. JSON → out/cartesia/text/; batch WAV → out/cartesia/tts/{en|es}/.
+ * EN 10+10 common/uncommon, ES full (JSON dual-run + batch TTS). OPENAI_API_KEY; CARTISIA_API_KEY for TTS.
  *
  * Commands:
- *   node scripts/elevenlabs-tts-test-names.mjs --write-confirmation-json
- *   node scripts/elevenlabs-tts-test-names.mjs --write-confirmation-json --locale en
- *   node scripts/elevenlabs-tts-test-names.mjs --write-tts-all
- *   node scripts/elevenlabs-tts-test-names.mjs --write-tts-batch --locale es
- *   node scripts/elevenlabs-tts-test-names.mjs --locale en --id common-1 --tts-out out/elevenlabs/tts/en/sample.mp3
- *   npm run tts-elevenlabs-json
- *   npm run tts-elevenlabs-names
+ *   node scripts/cartesia-tts-test-names.mjs --write-confirmation-json
+ *   node scripts/cartesia-tts-test-names.mjs --write-confirmation-json --locale en
+ *   node scripts/cartesia-tts-test-names.mjs --write-tts-all
+ *   node scripts/cartesia-tts-test-names.mjs --write-tts-batch --locale es
+ *   node scripts/cartesia-tts-test-names.mjs --locale en --id common-1 --tts-out out/cartesia/tts/en/sample.wav
+ *   npm run simulate
+ *   npm run tts-all
+ *   npm run tts-cartesia-json
+ *   npm run tts-cartesia-names
  */
+import "dotenv/config";
 import fs from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
-import dotenv from "dotenv";
 import OpenAI from "openai";
-import { getElevenLabsApiKey, synthesizeElevenLabsBytes } from "../lib/elevenlabs-tts.js";
+import { cartesiaVoiceForLocale, getCartesiaApiKey, synthesizeCartesiaBytes } from "../lib/cartesia-tts.js";
 import { loadNameEntries, pickNameEntry, runOneSimulation, stripSsmlBreaks } from "../lib/name-simulation.mjs";
 
 const root = path.join(path.dirname(fileURLToPath(import.meta.url)), "..");
-dotenv.config({ path: path.join(root, ".env") });
+const cartesiaOut = path.join(root, "out", "cartesia");
+const cartesiaTextDir = path.join(cartesiaOut, "text");
+const cartesiaTtsWavDir = (locale) => path.join(cartesiaOut, "tts", locale);
+const CARTESIA_EN_HEAD_EACH = 10;
 
-const elevenlabsOut = path.join(root, "out", "elevenlabs");
-const elevenlabsTextDir = path.join(elevenlabsOut, "text");
-const elevenlabsTtsMp3Dir = (locale) => path.join(elevenlabsOut, "tts", locale);
-const ELEVENLABS_EN_HEAD_EACH = 10;
+const CARTESIA_REST = {
+  model_id: process.env.CARTESIA_TTS_MODEL ?? "sonic-3-latest",
+  output_format: { container: "wav", encoding: "pcm_f32le", sample_rate: 44100 },
+  generation_config: { speed: 1, volume: 1.2, emotion: "neutral" },
+  cartesiaVersion: "2025-04-16",
+};
 
-function enHeadLoadOpts(locale) {
-  return locale === "en" ? { enHeadEach: ELEVENLABS_EN_HEAD_EACH } : {};
-}
-
-async function elevenLabsMp3Bytes(spoken, locale) {
-  return synthesizeElevenLabsBytes(stripSsmlBreaks(spoken), {
-    languageCode: locale === "es" ? "es" : "en",
+async function cartesiaWavBytes(spoken, locale) {
+  return synthesizeCartesiaBytes(stripSsmlBreaks(spoken), {
+    modelId: CARTESIA_REST.model_id,
+    voice: cartesiaVoiceForLocale(locale),
+    language: locale === "es" ? "es" : "en",
+    apiVersion: CARTESIA_REST.cartesiaVersion,
+    outputFormat: CARTESIA_REST.output_format,
+    generationConfig: CARTESIA_REST.generation_config,
   });
 }
 
@@ -45,9 +53,9 @@ async function writeConfirmationJsonForLocale(openai, outDir, locale, confirmati
       ? confirmationOutFile
       : path.join(outDir, confirmationOutFile)
     : path.join(
-        outDir,
-        locale === "es" ? "simulation-confirmation_sentences.es.json" : "simulation-confirmation_sentences.en.json",
-      );
+      outDir,
+      locale === "es" ? "simulation-confirmation_sentences.es.json" : "simulation-confirmation_sentences.en.json",
+    );
   fs.mkdirSync(path.dirname(outFile), { recursive: true });
   const payload = { version: 1, locale, source: sourceFile, generatedAt: new Date().toISOString(), entries: [] };
 
@@ -57,7 +65,7 @@ async function writeConfirmationJsonForLocale(openai, outDir, locale, confirmati
     process.stderr.write(`[${i + 1}/${entries.length}] ${entry.id} "${entry.fullName}" …\n`);
     await runOneSimulation(openai, { locale, id: entry.id, fullName: entry.fullName }, {
       log: (s) => sentences.push(s),
-      logErr: () => {},
+      logErr: () => { },
     });
     payload.entries.push({ id: entry.id, fullName: entry.fullName, confirmationSentences: sentences });
   }
@@ -66,15 +74,15 @@ async function writeConfirmationJsonForLocale(openai, outDir, locale, confirmati
   console.error(`Wrote ${payload.entries.length} entries to ${outFile}`);
 }
 
-async function writeTtsMp3ForLocale(openai, locale, dir, options = {}) {
-  const limit = options.limit ?? null;
-  const enHeadEach = locale === "en" ? (options.enHeadEach ?? ELEVENLABS_EN_HEAD_EACH) : null;
-  const loadOpts = enHeadEach != null ? { enHeadEach } : {};
-  let entries = loadNameEntries(locale, loadOpts);
-  if (limit != null) entries = entries.slice(0, limit);
+function enHeadLoadOpts(locale) {
+  return locale === "en" ? { enHeadEach: CARTESIA_EN_HEAD_EACH } : {};
+}
+
+async function writeTtsWavForLocale(openai, locale, dir, loadOpts = enHeadLoadOpts(locale)) {
+  const entries = loadNameEntries(locale, loadOpts);
   fs.mkdirSync(dir, { recursive: true });
   let wrote = 0;
-  const silent = { log: () => {}, logErr: () => {} };
+  const silent = { log: () => { }, logErr: () => { } };
   for (let i = 0; i < entries.length; i++) {
     const entry = entries[i];
     process.stderr.write(`[${i + 1}/${entries.length}] ${locale} ${entry.id} "${entry.fullName}" …\n`);
@@ -83,10 +91,10 @@ async function writeTtsMp3ForLocale(openai, locale, dir, options = {}) {
       console.error(`  skip (empty confirmation): ${entry.id}`);
       continue;
     }
-    fs.writeFileSync(path.join(dir, `${entry.id}.mp3`), await elevenLabsMp3Bytes(spoken, locale));
+    fs.writeFileSync(path.join(dir, `${entry.id}.wav`), await cartesiaWavBytes(spoken, locale));
     wrote += 1;
   }
-  console.error(`Wrote ${wrote} MP3 file(s) under ${dir}`);
+  console.error(`Wrote ${wrote} WAV file(s) under ${dir}`);
 }
 
 function parseCommandLine(argv) {
@@ -96,12 +104,10 @@ function parseCommandLine(argv) {
   let writeConfirmationJson = false;
   let writeTtsBatch = false;
   let writeTtsAllLocales = false;
-  let outDir = elevenlabsTextDir;
+  let outDir = cartesiaTextDir;
   let confirmationOut = null;
   let ttsOut = null;
   let ttsOutDir = null;
-  let enHeadEach = null;
-  let limit = null;
   for (let i = 0; i < argv.length; i++) {
     if (argv[i] === "--locale" && argv[i + 1]) {
       localeExplicit = true;
@@ -114,13 +120,6 @@ function parseCommandLine(argv) {
     else if (argv[i] === "--confirmation-out" && argv[i + 1]) confirmationOut = argv[++i];
     else if (argv[i] === "--tts-out" && argv[i + 1]) ttsOut = argv[++i];
     else if (argv[i] === "--tts-out-dir" && argv[i + 1]) ttsOutDir = path.resolve(argv[++i]);
-    else if (argv[i] === "--en-head-each" && argv[i + 1]) {
-      const n = parseInt(argv[++i], 10);
-      enHeadEach = Number.isFinite(n) ? n : null;
-    } else if (argv[i] === "--limit" && argv[i + 1]) {
-      const n = parseInt(argv[++i], 10);
-      limit = Number.isFinite(n) ? Math.max(0, n) : null;
-    }
   }
   return {
     locale,
@@ -133,8 +132,6 @@ function parseCommandLine(argv) {
     confirmationOut,
     ttsOut,
     ttsOutDir,
-    enHeadEach,
-    limit,
   };
 }
 
@@ -155,8 +152,6 @@ async function main() {
     confirmationOut,
     ttsOut,
     ttsOutDir,
-    enHeadEach,
-    limit,
   } = parseCommandLine(process.argv.slice(2));
 
   if (!process.env.OPENAI_API_KEY) bail("Missing OPENAI_API_KEY in environment.");
@@ -164,16 +159,9 @@ async function main() {
   if (writeConfirmationJson && anyTts) bail("Cannot combine --write-confirmation-json with TTS flags.");
   if (ttsOut && (writeTtsBatch || writeTtsAllLocales)) bail("Use either --tts-out or batch TTS flags, not both.");
   if (writeTtsBatch && writeTtsAllLocales) bail("Use either --write-tts-batch or --write-tts-all, not both.");
-  if (anyTts && !getElevenLabsApiKey()) bail("Missing ELEVENLABS_API_KEY for TTS.");
-  if (enHeadEach != null && !writeTtsBatch && !writeTtsAllLocales) {
-    bail("--en-head-each is only used with --write-tts-batch or --write-tts-all.");
-  }
-  if (enHeadEach != null && locale === "es" && writeTtsBatch && !writeTtsAllLocales) {
-    bail("With --en-head-each, use --locale en for --write-tts-batch, or use --write-tts-all.");
-  }
+  if (anyTts && !getCartesiaApiKey()) bail("Missing CARTISIA_API_KEY for TTS.");
 
   const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
-  const batchOpts = { enHeadEach, limit };
 
   if (writeConfirmationJson) {
     if (!localeExplicit && confirmationOut) {
@@ -188,12 +176,12 @@ async function main() {
     return;
   }
   if (writeTtsAllLocales) {
-    await writeTtsMp3ForLocale(openai, "en", elevenlabsTtsMp3Dir("en"), batchOpts);
-    await writeTtsMp3ForLocale(openai, "es", elevenlabsTtsMp3Dir("es"), batchOpts);
+    await writeTtsWavForLocale(openai, "en", cartesiaTtsWavDir("en"));
+    await writeTtsWavForLocale(openai, "es", cartesiaTtsWavDir("es"));
     return;
   }
   if (writeTtsBatch) {
-    await writeTtsMp3ForLocale(openai, locale, ttsOutDir ?? elevenlabsTtsMp3Dir(locale), batchOpts);
+    await writeTtsWavForLocale(openai, locale, ttsOutDir ?? cartesiaTtsWavDir(locale));
     return;
   }
 
@@ -206,7 +194,7 @@ async function main() {
   if (ttsOut && spoken?.trim()) {
     const outPath = path.resolve(ttsOut);
     fs.mkdirSync(path.dirname(outPath), { recursive: true });
-    fs.writeFileSync(outPath, await elevenLabsMp3Bytes(spoken, locale));
+    fs.writeFileSync(outPath, await cartesiaWavBytes(spoken, locale));
     console.error(`Wrote TTS → ${outPath}`);
   }
 }

@@ -5,9 +5,12 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "simulate": "node scripts/simulate-loop.mjs",
-    "tts-all": "node scripts/simulate-loop.mjs --write-tts-all",
-    "tts-elevenlabs-names": "node scripts/elevenlabs-tts-test-names.mjs"
+    "simulate": "node scripts/cartesia-tts-test-names.mjs",
+    "tts-all": "node scripts/cartesia-tts-test-names.mjs --write-tts-all",
+    "tts-cartesia-names": "node scripts/cartesia-tts-test-names.mjs",
+    "tts-cartesia-json": "node scripts/cartesia-tts-test-names.mjs --write-confirmation-json",
+    "tts-elevenlabs-names": "node scripts/elevenlabs-tts-test-names.mjs",
+    "tts-elevenlabs-json": "node scripts/elevenlabs-tts-test-names.mjs --write-confirmation-json"
   },
   "keywords": [],
   "author": "",

@@ -1,15 +1,11 @@
 /**
  * Name simulation + ElevenLabs TTS. JSON → out/elevenlabs/text/; batch MP3 → out/elevenlabs/tts/{en|es}/.
- * OPENAI_API_KEY; ELEVENLABS_API_KEY for TTS. JSON + batch TTS: EN 10+10 common/uncommon, ES full (override EN with --en-head-each; --limit caps batch).
+ * EN 10+10 common/uncommon, ES full (--en-head-each / --limit apply to batch TTS and to JSON+TTS). OPENAI_API_KEY; ELEVENLABS_API_KEY.
  *
  * Commands:
- *   node scripts/elevenlabs-tts-test-names.mjs --write-confirmation-json
- *   node scripts/elevenlabs-tts-test-names.mjs --write-confirmation-json --locale en
- *   node scripts/elevenlabs-tts-test-names.mjs --write-tts-all
- *   node scripts/elevenlabs-tts-test-names.mjs --write-tts-batch --locale es
- *   node scripts/elevenlabs-tts-test-names.mjs --locale en --id common-1 --tts-out out/elevenlabs/tts/en/sample.mp3
- *   npm run tts-elevenlabs-json
- *   npm run tts-elevenlabs-names
+ *   --write-confirmation-json [--write-tts-batch|--write-tts-all] [--locale en|es] [--en-head-each N] [--limit N]
+ * node scripts/elevenlabs-tts-test-names.mjs --write-confirmation-json --write-tts-batch
+ *   --locale en --id common-1 --tts-out path.mp3
  */
 import fs from "fs";
 import path from "path";
@@ -27,8 +23,20 @@ const elevenlabsTextDir = path.join(elevenlabsOut, "text");
 const elevenlabsTtsMp3Dir = (locale) => path.join(elevenlabsOut, "tts", locale);
 const ELEVENLABS_EN_HEAD_EACH = 10;
 
+const silentSinks = { log: () => { }, logErr: () => { } };
+
 function enHeadLoadOpts(locale) {
   return locale === "en" ? { enHeadEach: ELEVENLABS_EN_HEAD_EACH } : {};
+}
+
+/** Same entry selection as batch MP3 (--en-head-each for en only; --limit caps list). */
+function loadEntriesForBatch(locale, batchOpts = {}) {
+  const limit = batchOpts.limit ?? null;
+  const enHeadEach = locale === "en" ? (batchOpts.enHeadEach ?? ELEVENLABS_EN_HEAD_EACH) : null;
+  const loadOpts = enHeadEach != null ? { enHeadEach } : {};
+  let entries = loadNameEntries(locale, loadOpts);
+  if (limit != null) entries = entries.slice(0, limit);
+  return entries;
 }
 
 async function elevenLabsMp3Bytes(spoken, locale) {
@@ -37,48 +45,52 @@ async function elevenLabsMp3Bytes(spoken, locale) {
   });
 }
 
-async function writeConfirmationJsonForLocale(openai, outDir, locale, confirmationOutFile, loadOpts = {}) {
-  const entries = loadNameEntries(locale, loadOpts);
+async function writeConfirmationJsonForLocale(openai, outDir, locale, confirmationOutFile, loadOpts = {}, mp3Dir = null, limit = null) {
+  let entries = loadNameEntries(locale, loadOpts);
+  if (limit != null) entries = entries.slice(0, limit);
   const sourceFile = locale === "es" ? "test-names.es.json" : "test-names.en.json";
   const outFile = confirmationOutFile
     ? path.isAbsolute(confirmationOutFile)
       ? confirmationOutFile
       : path.join(outDir, confirmationOutFile)
     : path.join(
-        outDir,
-        locale === "es" ? "simulation-confirmation_sentences.es.json" : "simulation-confirmation_sentences.en.json",
-      );
+      outDir,
+      locale === "es" ? "simulation-confirmation_sentences.es.json" : "simulation-confirmation_sentences.en.json",
+    );
   fs.mkdirSync(path.dirname(outFile), { recursive: true });
   const payload = { version: 1, locale, source: sourceFile, generatedAt: new Date().toISOString(), entries: [] };
 
   for (let i = 0; i < entries.length; i++) {
     const entry = entries[i];
-    const sentences = [];
     process.stderr.write(`[${i + 1}/${entries.length}] ${entry.id} "${entry.fullName}" …\n`);
-    await runOneSimulation(openai, { locale, id: entry.id, fullName: entry.fullName }, {
-      log: (s) => sentences.push(s),
-      logErr: () => {},
+    const spoken = await runOneSimulation(openai, { locale, id: entry.id, fullName: entry.fullName }, silentSinks);
+    if (mp3Dir && spoken?.trim()) {
+      fs.mkdirSync(mp3Dir, { recursive: true });
+      fs.writeFileSync(path.join(mp3Dir, `${entry.id}.mp3`), await elevenLabsMp3Bytes(spoken, locale));
+    }
+    payload.entries.push({
+      id: entry.id,
+      fullName: entry.fullName,
+      confirmationSentences: spoken?.trim() ? [spoken] : [],
     });
-    payload.entries.push({ id: entry.id, fullName: entry.fullName, confirmationSentences: sentences });
   }
 
   fs.writeFileSync(outFile, JSON.stringify(payload, null, 2), "utf8");
-  console.error(`Wrote ${payload.entries.length} entries to ${outFile}`);
+  console.error(
+    mp3Dir
+      ? `Wrote ${payload.entries.length} entries to ${outFile}; MP3(s) under ${mp3Dir}`
+      : `Wrote ${payload.entries.length} entries to ${outFile}`,
+  );
 }
 
-async function writeTtsMp3ForLocale(openai, locale, dir, options = {}) {
-  const limit = options.limit ?? null;
-  const enHeadEach = locale === "en" ? (options.enHeadEach ?? ELEVENLABS_EN_HEAD_EACH) : null;
-  const loadOpts = enHeadEach != null ? { enHeadEach } : {};
-  let entries = loadNameEntries(locale, loadOpts);
-  if (limit != null) entries = entries.slice(0, limit);
+async function writeTtsMp3ForLocale(openai, locale, dir, batchOpts = {}) {
+  const entries = loadEntriesForBatch(locale, batchOpts);
   fs.mkdirSync(dir, { recursive: true });
   let wrote = 0;
-  const silent = { log: () => {}, logErr: () => {} };
   for (let i = 0; i < entries.length; i++) {
     const entry = entries[i];
     process.stderr.write(`[${i + 1}/${entries.length}] ${locale} ${entry.id} "${entry.fullName}" …\n`);
-    const spoken = await runOneSimulation(openai, { locale, id: entry.id, fullName: entry.fullName }, silent);
+    const spoken = await runOneSimulation(openai, { locale, id: entry.id, fullName: entry.fullName }, silentSinks);
     if (!spoken?.trim()) {
       console.error(`  skip (empty confirmation): ${entry.id}`);
       continue;
@@ -161,10 +173,13 @@ async function main() {
 
   if (!process.env.OPENAI_API_KEY) bail("Missing OPENAI_API_KEY in environment.");
   const anyTts = ttsOut || writeTtsBatch || writeTtsAllLocales;
-  if (writeConfirmationJson && anyTts) bail("Cannot combine --write-confirmation-json with TTS flags.");
+  const jsonAndTtsBatch = writeConfirmationJson && (writeTtsBatch || writeTtsAllLocales);
+  if (writeConfirmationJson && anyTts && !jsonAndTtsBatch) {
+    bail("Cannot combine --write-confirmation-json with --tts-out (use --write-tts-batch|--write-tts-all with JSON, or --tts-out alone; text → stdout).");
+  }
   if (ttsOut && (writeTtsBatch || writeTtsAllLocales)) bail("Use either --tts-out or batch TTS flags, not both.");
   if (writeTtsBatch && writeTtsAllLocales) bail("Use either --write-tts-batch or --write-tts-all, not both.");
-  if (anyTts && !getElevenLabsApiKey()) bail("Missing ELEVENLABS_API_KEY for TTS.");
+  if ((anyTts || jsonAndTtsBatch) && !getElevenLabsApiKey()) bail("Missing ELEVENLABS_API_KEY for TTS.");
   if (enHeadEach != null && !writeTtsBatch && !writeTtsAllLocales) {
     bail("--en-head-each is only used with --write-tts-batch or --write-tts-all.");
   }
@@ -178,6 +193,17 @@ async function main() {
   if (writeConfirmationJson) {
     if (!localeExplicit && confirmationOut) {
       bail("With --write-confirmation-json, use --locale when using --confirmation-out (or omit --confirmation-out for default filenames).");
+    }
+    if (jsonAndTtsBatch) {
+      const enLoad = { enHeadEach: batchOpts.enHeadEach ?? ELEVENLABS_EN_HEAD_EACH };
+      if (writeTtsAllLocales || !localeExplicit) {
+        await writeConfirmationJsonForLocale(openai, outDir, "en", null, enLoad, elevenlabsTtsMp3Dir("en"), batchOpts.limit);
+        await writeConfirmationJsonForLocale(openai, outDir, "es", null, {}, elevenlabsTtsMp3Dir("es"), batchOpts.limit);
+      } else {
+        const loadOpts = locale === "en" ? enLoad : {};
+        await writeConfirmationJsonForLocale(openai, outDir, locale, confirmationOut, loadOpts, ttsOutDir ?? elevenlabsTtsMp3Dir(locale), batchOpts.limit);
+      }
+      return;
     }
     if (localeExplicit) {
       await writeConfirmationJsonForLocale(openai, outDir, locale, confirmationOut, enHeadLoadOpts(locale));

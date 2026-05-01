@@ -3,15 +3,8 @@
  * EN 10+10 common/uncommon, ES full (JSON dual-run + batch TTS). OPENAI_API_KEY; CARTISIA_API_KEY for TTS.
  *
  * Commands:
- *   node scripts/cartesia-tts-test-names.mjs --write-confirmation-json
- *   node scripts/cartesia-tts-test-names.mjs --write-confirmation-json --locale en
- *   node scripts/cartesia-tts-test-names.mjs --write-tts-all
- *   node scripts/cartesia-tts-test-names.mjs --write-tts-batch --locale es
- *   node scripts/cartesia-tts-test-names.mjs --locale en --id common-1 --tts-out out/cartesia/tts/en/sample.wav
- *   npm run simulate
- *   npm run tts-all
- *   npm run tts-cartesia-json
- *   npm run tts-cartesia-names
+ *   --write-confirmation-json [--write-tts-batch|--write-tts-all] [--locale en|es]
+ *   --locale en --id common-1 --tts-out path.wav
  */
 import "dotenv/config";
 import fs from "fs";
@@ -34,6 +27,8 @@ const CARTESIA_REST = {
   cartesiaVersion: "2025-04-16",
 };
 
+const silentSinks = { log: () => {}, logErr: () => {} };
+
 async function cartesiaWavBytes(spoken, locale) {
   return synthesizeCartesiaBytes(stripSsmlBreaks(spoken), {
     modelId: CARTESIA_REST.model_id,
@@ -45,7 +40,7 @@ async function cartesiaWavBytes(spoken, locale) {
   });
 }
 
-async function writeConfirmationJsonForLocale(openai, outDir, locale, confirmationOutFile, loadOpts = {}) {
+async function writeConfirmationJsonForLocale(openai, outDir, locale, confirmationOutFile, loadOpts = {}, wavDir = null) {
   const entries = loadNameEntries(locale, loadOpts);
   const sourceFile = locale === "es" ? "test-names.es.json" : "test-names.en.json";
   const outFile = confirmationOutFile
@@ -61,17 +56,25 @@ async function writeConfirmationJsonForLocale(openai, outDir, locale, confirmati
 
   for (let i = 0; i < entries.length; i++) {
     const entry = entries[i];
-    const sentences = [];
     process.stderr.write(`[${i + 1}/${entries.length}] ${entry.id} "${entry.fullName}" …\n`);
-    await runOneSimulation(openai, { locale, id: entry.id, fullName: entry.fullName }, {
-      log: (s) => sentences.push(s),
-      logErr: () => { },
+    const spoken = await runOneSimulation(openai, { locale, id: entry.id, fullName: entry.fullName }, silentSinks);
+    if (wavDir && spoken?.trim()) {
+      fs.mkdirSync(wavDir, { recursive: true });
+      fs.writeFileSync(path.join(wavDir, `${entry.id}.wav`), await cartesiaWavBytes(spoken, locale));
+    }
+    payload.entries.push({
+      id: entry.id,
+      fullName: entry.fullName,
+      confirmationSentences: spoken?.trim() ? [spoken] : [],
     });
-    payload.entries.push({ id: entry.id, fullName: entry.fullName, confirmationSentences: sentences });
   }
 
   fs.writeFileSync(outFile, JSON.stringify(payload, null, 2), "utf8");
-  console.error(`Wrote ${payload.entries.length} entries to ${outFile}`);
+  console.error(
+    wavDir
+      ? `Wrote ${payload.entries.length} entries to ${outFile}; WAV(s) under ${wavDir}`
+      : `Wrote ${payload.entries.length} entries to ${outFile}`,
+  );
 }
 
 function enHeadLoadOpts(locale) {
@@ -82,11 +85,10 @@ async function writeTtsWavForLocale(openai, locale, dir, loadOpts = enHeadLoadOp
   const entries = loadNameEntries(locale, loadOpts);
   fs.mkdirSync(dir, { recursive: true });
   let wrote = 0;
-  const silent = { log: () => { }, logErr: () => { } };
   for (let i = 0; i < entries.length; i++) {
     const entry = entries[i];
     process.stderr.write(`[${i + 1}/${entries.length}] ${locale} ${entry.id} "${entry.fullName}" …\n`);
-    const spoken = await runOneSimulation(openai, { locale, id: entry.id, fullName: entry.fullName }, silent);
+    const spoken = await runOneSimulation(openai, { locale, id: entry.id, fullName: entry.fullName }, silentSinks);
     if (!spoken?.trim()) {
       console.error(`  skip (empty confirmation): ${entry.id}`);
       continue;
@@ -156,16 +158,28 @@ async function main() {
 
   if (!process.env.OPENAI_API_KEY) bail("Missing OPENAI_API_KEY in environment.");
   const anyTts = ttsOut || writeTtsBatch || writeTtsAllLocales;
-  if (writeConfirmationJson && anyTts) bail("Cannot combine --write-confirmation-json with TTS flags.");
+  const jsonAndTtsBatch = writeConfirmationJson && (writeTtsBatch || writeTtsAllLocales);
+  if (writeConfirmationJson && anyTts && !jsonAndTtsBatch) {
+    bail("Cannot combine --write-confirmation-json with --tts-out (use --write-tts-batch|--write-tts-all with JSON, or --tts-out alone; text → stdout).");
+  }
   if (ttsOut && (writeTtsBatch || writeTtsAllLocales)) bail("Use either --tts-out or batch TTS flags, not both.");
   if (writeTtsBatch && writeTtsAllLocales) bail("Use either --write-tts-batch or --write-tts-all, not both.");
-  if (anyTts && !getCartesiaApiKey()) bail("Missing CARTISIA_API_KEY for TTS.");
+  if ((anyTts || jsonAndTtsBatch) && !getCartesiaApiKey()) bail("Missing CARTISIA_API_KEY for TTS.");
 
   const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
   if (writeConfirmationJson) {
     if (!localeExplicit && confirmationOut) {
       bail("With --write-confirmation-json, use --locale when using --confirmation-out (or omit --confirmation-out for default filenames).");
+    }
+    if (jsonAndTtsBatch) {
+      if (writeTtsAllLocales || !localeExplicit) {
+        await writeConfirmationJsonForLocale(openai, outDir, "en", null, enHeadLoadOpts("en"), cartesiaTtsWavDir("en"));
+        await writeConfirmationJsonForLocale(openai, outDir, "es", null, enHeadLoadOpts("es"), cartesiaTtsWavDir("es"));
+      } else {
+        await writeConfirmationJsonForLocale(openai, outDir, locale, confirmationOut, enHeadLoadOpts(locale), ttsOutDir ?? cartesiaTtsWavDir(locale));
+      }
+      return;
     }
     if (localeExplicit) {
       await writeConfirmationJsonForLocale(openai, outDir, locale, confirmationOut, enHeadLoadOpts(locale));

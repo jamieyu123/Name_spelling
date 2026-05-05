@@ -5,6 +5,7 @@
  * Commands:
  *   --write-confirmation-json [--write-tts-batch|--write-tts-all] [--locale en|es]
  *   --locale en --id common-1 --tts-out path.wav
+ *   node scripts/cartesia-tts-test-names.mjs --write-confirmation-json --write-tts-batch
  */
 import "dotenv/config";
 import fs from "fs";
@@ -27,7 +28,7 @@ const CARTESIA_REST = {
   cartesiaVersion: "2025-04-16",
 };
 
-const silentSinks = { log: () => {}, logErr: () => {} };
+const silentSinks = { log: () => { }, logErr: () => { } };
 
 async function cartesiaWavBytes(spoken, locale) {
   return synthesizeCartesiaBytes(stripSsmlBreaks(spoken), {

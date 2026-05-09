@@ -1,0 +1,30 @@
+{
+  "version": 1,
+  "description": "Small sample set: 5 common English names, 5 uncommon English names, and 10 Spanish names for quick testing of name capture and spelling flows.",
+  "common": [
+    { "id": "common-1", "fullName": "James Smith", "locale": "en" },
+    { "id": "common-2", "fullName": "Mary Johnson", "locale": "en" },
+    { "id": "common-3", "fullName": "Robert Williams", "locale": "en" },
+    { "id": "common-4", "fullName": "Patricia Brown", "locale": "en" },
+    { "id": "common-5", "fullName": "Michael Jones", "locale": "en" }
+  ],
+  "uncommon": [
+    { "id": "uncommon-1", "fullName": "Quynh Nguyen", "locale": "en" },
+    { "id": "uncommon-2", "fullName": "Priya Patel", "locale": "en" },
+    { "id": "uncommon-3", "fullName": "Saanvi Krishnan", "locale": "en" },
+    { "id": "uncommon-4", "fullName": "Oleg Volkov", "locale": "en" },
+    { "id": "uncommon-5", "fullName": "Ngozi Okonkwo", "locale": "en" }
+  ],
+  "spanish": [
+    { "id": "es-1", "fullName": "José García", "locale": "es" },
+    { "id": "es-2", "fullName": "María López", "locale": "es" },
+    { "id": "es-3", "fullName": "Carlos Martínez", "locale": "es" },
+    { "id": "es-4", "fullName": "Lucía Hernández", "locale": "es" },
+    { "id": "es-5", "fullName": "Javier Muñoz", "locale": "es" },
+    { "id": "es-6", "fullName": "Sofía Ramírez", "locale": "es" },
+    { "id": "es-7", "fullName": "Andrés Peña", "locale": "es" },
+    { "id": "es-8", "fullName": "Beatriz Vázquez", "locale": "es" },
+    { "id": "es-9", "fullName": "Rodrigo Gutiérrez", "locale": "es" },
+    { "id": "es-10", "fullName": "Camila Fernández", "locale": "es" }
+  ]
+}

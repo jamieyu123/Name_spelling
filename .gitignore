@@ -3,3 +3,4 @@ node_modules/
 # Generated TTS (see scripts/cartesia-tts-test-names.mjs, scripts/elevenlabs-tts-test-names.mjs)
 out/cartesia
 out/elevenlabs
+out/deepgram
